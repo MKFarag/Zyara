@@ -5,7 +5,6 @@ namespace Infrastructure.Persistence;
 
 public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext(options)
 {
-
     #region DbSets
 
 
