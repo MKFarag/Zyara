@@ -2,6 +2,7 @@
 using Application.Interfaces.Infrastructure;
 using Hangfire;
 using Infrastructure;
+using Infrastructure.Persistence;
 using Infrastructure.Services;
 using Presentation.Abstraction;
 using Presentation.OpenApiTransformations;
@@ -18,7 +19,7 @@ public static class DependencyInjection
         services.AddExceptionHandlerConfig();
         services.AddHangfireConfig(configuration);
 
-
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services
             .AddEndpointsApiExplorer()
