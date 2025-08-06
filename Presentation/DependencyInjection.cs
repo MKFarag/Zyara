@@ -1,6 +1,7 @@
 ﻿using Presentation.OpenApiTransformations;
 using Infrastructure;
 using Application;
+using Presentation.Abstraction;
 
 namespace Presentation;
 
@@ -11,6 +12,7 @@ public static class DependencyInjection
         services.AddControllers();
         services.AddInfrastructureDependencies(configuration);
         services.AddApplicationDependencies();
+        services.AddExceptionHandlerConfig();
 
         services
             .AddEndpointsApiExplorer()
@@ -18,6 +20,24 @@ public static class DependencyInjection
 
         return services;
     }
+
+    #region ExceptionHandler
+
+    private static IServiceCollection AddExceptionHandlerConfig(this IServiceCollection services)
+    {
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
+
+        return services;
+    }
+
+    #endregion
+
+    #region
+
+
+
+    #endregion
 
     #region OpenApi
 
