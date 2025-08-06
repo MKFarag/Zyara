@@ -1,7 +1,10 @@
-﻿using Presentation.OpenApiTransformations;
+﻿using Application;
+using Application.Interfaces.Infrastructure;
+using Hangfire;
 using Infrastructure;
-using Application;
+using Infrastructure.Services;
 using Presentation.Abstraction;
+using Presentation.OpenApiTransformations;
 
 namespace Presentation;
 
@@ -13,6 +16,9 @@ public static class DependencyInjection
         services.AddInfrastructureDependencies(configuration);
         services.AddApplicationDependencies();
         services.AddExceptionHandlerConfig();
+        services.AddHangfireConfig(configuration);
+
+
 
         services
             .AddEndpointsApiExplorer()
@@ -33,9 +39,23 @@ public static class DependencyInjection
 
     #endregion
 
-    #region
+    #region Hangfire
 
+    private static IServiceCollection AddHangfireConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddScoped<IJobManager, JobManager>();
 
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection"))
+        );
+
+        services.AddHangfireServer();
+
+        return services;
+    }
 
     #endregion
 

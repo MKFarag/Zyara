@@ -1,5 +1,7 @@
 #region Usings
 
+using Hangfire;
+using HangfireBasicAuthenticationFilter;
 using Presentation;
 using Scalar.AspNetCore;
 using Serilog;
@@ -14,7 +16,6 @@ builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Confi
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -24,6 +25,20 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
+
+app.MapHangfireDashboard("/jobs", new DashboardOptions
+{
+    Authorization =
+    [
+        new HangfireCustomBasicAuthenticationFilter
+        {
+            User = app.Configuration.GetValue<string>("Hangfire:Username"),
+            Pass = app.Configuration.GetValue<string>("Hangfire:Password")
+        }
+    ],
+    DashboardTitle = "Zyara Dashboard",
+    IsReadOnlyFunc = context => true
+});
 
 app.UseAuthorization();
 

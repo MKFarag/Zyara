@@ -2,3 +2,5 @@
 global using Domain.Entities;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Microsoft.AspNetCore.Identity;
+global using Application.Interfaces.Infrastructure;
+global using System.Linq.Expressions;
