@@ -1,9 +1,11 @@
 ﻿using Application;
 using Application.Interfaces.Infrastructure;
+using Domain.Settings;
 using Hangfire;
 using Infrastructure;
 using Infrastructure.Persistence;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Presentation.Abstraction;
 using Presentation.OpenApiTransformations;
 
@@ -18,6 +20,8 @@ public static class DependencyInjection
         services.AddApplicationDependencies();
         services.AddExceptionHandlerConfig();
         services.AddHangfireConfig(configuration);
+        services.AddHttpContextAccessor();
+        services.AddMailConfig(configuration);
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -54,6 +58,26 @@ public static class DependencyInjection
         );
 
         services.AddHangfireServer();
+
+        return services;
+    }
+
+    #endregion
+
+    #region Mail
+
+    private static IServiceCollection AddMailConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<EmailTemplateOptions>()
+            .Bind(configuration.GetSection(nameof(EmailTemplateOptions)));
+
+        services.AddOptions<MailSettings>()
+            .Bind(configuration.GetSection(nameof(MailSettings)))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddScoped<IEmailSender, EmailService>();
+        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 
         return services;
     }

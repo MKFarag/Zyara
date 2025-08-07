@@ -8,15 +8,6 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDatabaseConfig(configuration);
-
-        return services;
-    }
-
-    #region Database
-
-    private static IServiceCollection AddDatabaseConfig(this IServiceCollection services, IConfiguration configuration)
-    {
         var connectionString = configuration.GetConnectionString("DefaultConnection") ??
             throw new InvalidOperationException("DefaultConnection is not found.");
 
@@ -28,6 +19,4 @@ public static class DependencyInjection
 
         return services;
     }
-
-    #endregion
 }
