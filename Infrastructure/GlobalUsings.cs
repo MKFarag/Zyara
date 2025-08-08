@@ -11,3 +11,4 @@ global using Microsoft.Extensions.Options;
 global using Domain.Settings;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.AspNetCore.Http;
+global using System.Text;

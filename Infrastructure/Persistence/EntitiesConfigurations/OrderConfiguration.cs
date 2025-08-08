@@ -1,0 +1,13 @@
+﻿namespace Infrastructure.Persistence.EntitiesConfigurations;
+
+internal class OrderConfiguration : IEntityTypeConfiguration<Order>
+{
+    public void Configure(EntityTypeBuilder<Order> builder)
+    {
+        // Properties
+
+        builder
+            .Property(o => o.Status)
+            .HasMaxLength(50);
+    }
+}

@@ -4,6 +4,18 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
+        // Relationship with RefreshToken
+
+        builder
+            .OwnsMany(u => u.RefreshTokens)
+            .ToTable(nameof(RefreshToken) + "s")
+            .WithOwner()
+            .HasForeignKey("UserId");
+
+        //////////////////////////////////////////////////////////////////////////
+
+        // Properties
+
         builder
             .Property(u => u.FirstName)
             .HasMaxLength(50);
@@ -11,11 +23,5 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
         builder
             .Property(u => u.LastName)
             .HasMaxLength(50);
-
-        builder
-            .OwnsMany(u => u.RefreshTokens)
-            .ToTable(nameof(RefreshToken) + "s")
-            .WithOwner()
-            .HasForeignKey("UserId");
     }
 }
