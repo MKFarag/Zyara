@@ -8,14 +8,17 @@ public class UnitOfWork : IUnitOfWork
     private bool _disposed = false;
 
     public IUserRepository Users { get; private set; }
+    public IRoleRepository Roles { get; private set; }
 
     public UnitOfWork(
         ApplicationDbContext context,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager)
     {
         _context = context;
 
         Users = new UserRepository(_context, userManager);
+        Roles = new RoleRepository(_context, roleManager);
     }
 
     public int Complete()

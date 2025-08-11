@@ -23,7 +23,8 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddMailConfig(configuration);
 
-        //services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ISignInService, SignInService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services
             .AddEndpointsApiExplorer()
