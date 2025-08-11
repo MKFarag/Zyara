@@ -1,13 +1,21 @@
-﻿namespace Infrastructure.Persistence;
+﻿using Infrastructure.Persistence.Repositories;
+
+namespace Infrastructure.Persistence;
 
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
     private bool _disposed = false;
 
-    public UnitOfWork(ApplicationDbContext context)
+    public IUserRepository Users { get; private set; }
+
+    public UnitOfWork(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
+
+        Users = new UserRepository(_context, userManager);
     }
 
     public int Complete()
