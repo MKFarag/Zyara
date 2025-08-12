@@ -40,6 +40,8 @@ app.MapHangfireDashboard("/jobs", new DashboardOptions
     IsReadOnlyFunc = context => true
 });
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

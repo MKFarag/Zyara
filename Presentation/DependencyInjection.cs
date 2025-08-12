@@ -1,13 +1,24 @@
-﻿using Application;
+﻿#region Usings
+
+using Application;
 using Application.Interfaces.Infrastructure;
+using Domain.Entities;
 using Domain.Settings;
 using Hangfire;
 using Infrastructure;
+using Infrastructure.Authentication;
 using Infrastructure.Persistence;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.IdentityModel.Tokens;
 using Presentation.Abstraction;
 using Presentation.OpenApiTransformations;
+using System.Text; 
+
+#endregion
 
 namespace Presentation;
 
@@ -22,8 +33,8 @@ public static class DependencyInjection
         services.AddHangfireConfig(configuration);
         services.AddHttpContextAccessor();
         services.AddMailConfig(configuration);
+        services.AddAuthConfig(configuration);
 
-        services.AddScoped<ISignInService, SignInService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services
@@ -79,6 +90,92 @@ public static class DependencyInjection
 
         services.AddScoped<IEmailSender, EmailService>();
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+
+        return services;
+    }
+
+    #endregion
+
+    #region Auth
+
+    private static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        #region Jwt
+
+        services.AddSingleton<IJwtProvider, JwtProvider>();
+
+        services.AddOptions<JwtOptions>()
+            .BindConfiguration(JwtOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        #endregion
+
+        #region Roles
+
+        //services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        //services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
+
+        #endregion
+
+        #region Add Identity
+
+        services.AddIdentity<ApplicationUser, ApplicationRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+        #endregion
+
+        #region Validations
+
+        var settings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
+
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(o =>
+            {
+                o.SaveToken = true;
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings?.Key!)),
+                    ValidIssuer = settings?.Issuer,
+                    ValidAudience = settings?.Audience
+                };
+            });
+
+        #endregion
+
+        #region Identity Configurations
+
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequiredLength = 8;
+            options.SignIn.RequireConfirmedEmail = true;
+            options.User.RequireUniqueEmail = true;
+        });
+
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+        {
+            options.TokenLifespan = TimeSpan.FromHours(24);
+        });
+
+        #endregion
+
+        #region Service Lifetime
+
+        //services.AddScoped<IAuthService, AuthService>();
+        //services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<ISignInService, SignInService>();
+
+        #endregion
 
         return services;
     }
