@@ -2,6 +2,7 @@
 
 using Application;
 using Application.Interfaces.Infrastructure;
+using Application.Services;
 using Domain.Entities;
 using Domain.Settings;
 using Hangfire;
@@ -171,7 +172,7 @@ public static class DependencyInjection
 
         #region Service Lifetime
 
-        //services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthService, AuthService>();
         //services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<ISignInService, SignInService>();
 

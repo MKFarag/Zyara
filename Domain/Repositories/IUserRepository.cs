@@ -15,6 +15,9 @@ public interface IUserRepository : IGenericRepository<ApplicationUser, string>
     /// <summary>Check if the email is already used by another user</summary>
     Task<bool> EmailExistsAsync(string email, string userId, CancellationToken cancellationToken = default);
 
+    /// <summary>Check if the username exists</summary>
+    Task<bool> UserNameExistsAsync(string userName, CancellationToken cancellationToken = default);
+
     /// <summary>Bulk update the user's name by user id</summary>
     Task BulkNameUpdateAsync(string userId, string firstName, string lastName, CancellationToken cancellationToken = default);
 
@@ -67,6 +70,9 @@ public interface IUserRepository : IGenericRepository<ApplicationUser, string>
 
     /// <summary>Find a user by email</summary>
     Task<ApplicationUser?> FindByEmailAsync(string email);
+
+    /// <summary>Find a user by username</summary>
+    Task<ApplicationUser?> FindByUserNameAsync(string userName);
 
     /// <summary>Normalize the email address</summary>
     string NormalizeEmail(string email);

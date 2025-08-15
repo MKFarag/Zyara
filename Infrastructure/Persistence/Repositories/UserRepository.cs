@@ -69,6 +69,14 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
             .AnyAsync(u => u.NormalizedEmail == email && u.Id != userId, cancellationToken);
     }
 
+    public async Task<bool> UserNameExistsAsync(string userName, CancellationToken cancellationToken = default)
+    {
+        userName = NormalizeName(userName);
+
+        return await _context.Users.AsNoTracking()
+            .AnyAsync(u => u.NormalizedUserName == userName, cancellationToken);
+    }
+
     public async Task BulkNameUpdateAsync(string userId, string firstName, string lastName, CancellationToken cancellationToken = default)
         => await _context.Users
             .Where(u => u.Id == userId)
@@ -128,6 +136,9 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
 
     public async Task<ApplicationUser?> FindByEmailAsync(string email)
         => await _userManager.FindByEmailAsync(email);
+
+    public async Task<ApplicationUser?> FindByUserNameAsync(string userName)
+        => await _userManager.FindByNameAsync(userName);
 
     public string NormalizeEmail(string email)
         => _userManager.NormalizeEmail(email);
