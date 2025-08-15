@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddExceptionHandlerConfig();
         services.AddHangfireConfig(configuration);
         services.AddHttpContextAccessor();
+        services.AddCORSConfig(configuration);
         services.AddMailConfig(configuration);
         services.AddAuthConfig(configuration);
 
@@ -71,6 +72,26 @@ public static class DependencyInjection
         );
 
         services.AddHangfireServer();
+
+        return services;
+    }
+
+    #endregion
+
+    #region CORS
+
+    private static IServiceCollection AddCORSConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(builder =>
+            {
+                builder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!);
+            });
+        });
 
         return services;
     }
