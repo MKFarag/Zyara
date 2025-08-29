@@ -11,7 +11,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     #region DbSet
 
-
+    public DbSet<Address> Addresses { get; set; } = default!;
+    public DbSet<Cart> Carts { get; set; } = default!;
+    public DbSet<Customer> Customers { get; set; } = default!;
+    public DbSet<CustomerPhoneNumber> CustomerPhoneNumbers { get; set; } = default!;
+    public DbSet<DeliveryMan> DeliveryMen { get; set; } = default!;
+    public DbSet<Order> Orders { get; set; } = default!;
+    public DbSet<OrderItem> OrderItems { get; set; } = default!;
+    public DbSet<Product> Products { get; set; } = default!;
 
     #endregion
 
