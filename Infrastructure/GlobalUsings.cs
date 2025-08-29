@@ -1,1 +1,6 @@
-﻿
+﻿global using Microsoft.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Identity;
+global using Domain.Entities;
+global using Infrastructure.Persistence.Identities;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Infrastructure.Persistence;
