@@ -10,6 +10,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.Abstraction;
 using Presentation.OpenApiTransformers;
 using System.Text;
 
@@ -22,6 +23,8 @@ public static class DependencyInjection
     public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
         services.AddInfrastructureDependencies(configuration);
         services.AddApplicationDependencies();
         services.AddAuthConfig(configuration);
