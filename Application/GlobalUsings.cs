@@ -1,3 +1,4 @@
 ﻿global using Domain.Entities;
 global using FluentValidation;
 global using Mapster;
+global using System.Linq.Expressions;

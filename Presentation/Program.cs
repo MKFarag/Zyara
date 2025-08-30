@@ -3,6 +3,8 @@
 using Presentation;
 using Serilog;
 using Scalar.AspNetCore;
+using Hangfire;
+using HangfireBasicAuthenticationFilter;
 
 #endregion
 
@@ -24,6 +26,20 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
+
+app.MapHangfireDashboard("/jobs", new DashboardOptions
+{
+    Authorization =
+    [
+        new HangfireCustomBasicAuthenticationFilter
+         {
+             User = app.Configuration.GetValue<string>("Hangfire:Username"),
+             Pass = app.Configuration.GetValue<string>("Hangfire:Password")
+         }
+    ],
+    DashboardTitle = "Zyara Hangfire Dashboard",
+    IsReadOnlyFunc = context => true
+});
 
 app.UseAuthentication();
 

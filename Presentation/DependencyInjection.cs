@@ -1,10 +1,12 @@
 ﻿#region Usings
 
 using Application;
+using Hangfire;
 using Infrastructure;
 using Infrastructure.Authentication;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Identities;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -23,7 +25,7 @@ public static class DependencyInjection
         services.AddInfrastructureDependencies(configuration);
         services.AddApplicationDependencies();
         services.AddAuthConfig(configuration);
-
+        services.AddHangfireConfig(configuration);
         
         services
             .AddEndpointsApiExplorer()
@@ -112,6 +114,26 @@ public static class DependencyInjection
         //services.AddScoped<ISignInService, SignInService>();
 
         #endregion
+
+        return services;
+    }
+
+    #endregion
+
+    #region Hangfire
+
+    private static IServiceCollection AddHangfireConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddScoped<IJobManager, JobManager>();
+
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection"))
+        );
+
+        services.AddHangfireServer();
 
         return services;
     }

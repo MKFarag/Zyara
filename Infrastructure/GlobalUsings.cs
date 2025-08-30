@@ -7,3 +7,4 @@ global using Infrastructure.Persistence;
 global using System.ComponentModel.DataAnnotations;
 global using Microsoft.Extensions.Options;
 global using Application.Interfaces.Infrastructure;
+global using System.Linq.Expressions;
