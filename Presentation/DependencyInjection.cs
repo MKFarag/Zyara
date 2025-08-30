@@ -7,6 +7,7 @@ using Infrastructure.Persistence.Identities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.OpenApiTransformers;
 using System.Text;
 
 #endregion
@@ -21,9 +22,10 @@ public static class DependencyInjection
         services.AddInfrastructureDependencies(configuration);
         services.AddAuthConfig(configuration);
 
+        
         services
             .AddEndpointsApiExplorer()
-            .AddOpenApi();
+            .AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 
         return services;
     }
