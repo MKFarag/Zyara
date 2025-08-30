@@ -27,7 +27,7 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
         //////////////////////////////////////////////////////////////////////////
 
         // Default data
-
+        // AQAAAAIAAYagAAAAEMfH4k2juBLnlEzDH7A+c+W1J/CdHuy/Hb0F/apEtpaE+vHiPTwOZeUG+2MpHjgdOw==
         //builder
         //    .HasData(new ApplicationUser
         //    {

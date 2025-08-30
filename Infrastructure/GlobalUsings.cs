@@ -4,3 +4,6 @@ global using Domain.Entities;
 global using Infrastructure.Persistence.Identities;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Infrastructure.Persistence;
+global using System.ComponentModel.DataAnnotations;
+global using Microsoft.Extensions.Options;
+global using Application.Interfaces.Infrastructure;
