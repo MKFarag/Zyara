@@ -1,5 +1,6 @@
 ﻿#region Usings
 
+using Application;
 using Infrastructure;
 using Infrastructure.Authentication;
 using Infrastructure.Persistence;
@@ -20,6 +21,7 @@ public static class DependencyInjection
     {
         services.AddControllers();
         services.AddInfrastructureDependencies(configuration);
+        services.AddApplicationDependencies();
         services.AddAuthConfig(configuration);
 
         
