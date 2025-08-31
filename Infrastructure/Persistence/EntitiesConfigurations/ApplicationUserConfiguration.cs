@@ -27,21 +27,21 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
         //////////////////////////////////////////////////////////////////////////
 
         // Default data
-        // AQAAAAIAAYagAAAAEMfH4k2juBLnlEzDH7A+c+W1J/CdHuy/Hb0F/apEtpaE+vHiPTwOZeUG+2MpHjgdOw==
-        //builder
-        //    .HasData(new ApplicationUser
-        //    {
-        //        Id = DefaultUsers.Admin.Id,
-        //        Email = DefaultUsers.Admin.Email,
-        //        NormalizedEmail = DefaultUsers.Admin.Email.ToUpper(),
-        //        UserName = DefaultUsers.Admin.UserName,
-        //        NormalizedUserName = DefaultUsers.Admin.UserName.ToUpper(),
-        //        PasswordHash = DefaultUsers.Admin.PasswordHash,
-        //        ConcurrencyStamp = DefaultUsers.Admin.ConcurrencyStamp,
-        //        SecurityStamp = DefaultUsers.Admin.SecurityStamp,
-        //        FirstName = DefaultUsers.Admin.FirstName,
-        //        LastName = DefaultUsers.Admin.LastName,
-        //        EmailConfirmed = true
-        //    });
+
+        builder
+            .HasData(new ApplicationUser
+            {
+                Id = DefaultUsers.Admin.Id,
+                Email = DefaultUsers.Admin.Email,
+                NormalizedEmail = DefaultUsers.Admin.Email.ToUpper(),
+                UserName = DefaultUsers.Admin.UserName,
+                NormalizedUserName = DefaultUsers.Admin.UserName.ToUpper(),
+                PasswordHash = DefaultUsers.Admin.PasswordHash,
+                ConcurrencyStamp = DefaultUsers.Admin.ConcurrencyStamp,
+                SecurityStamp = DefaultUsers.Admin.SecurityStamp,
+                FirstName = DefaultUsers.Admin.FirstName,
+                LastName = DefaultUsers.Admin.LastName,
+                EmailConfirmed = true
+            });
     }
 }
