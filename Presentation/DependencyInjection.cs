@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddApplicationDependencies();
         services.AddAuthConfig(configuration);
         services.AddHangfireConfig(configuration);
+        services.AddHttpContextAccessor();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

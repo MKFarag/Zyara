@@ -15,3 +15,5 @@ global using Domain.Errors;
 global using Mapster;
 global using Microsoft.AspNetCore.Http;
 global using Infrastructure.Extensions;
+global using Domain.Settings;
+global using Microsoft.Extensions.Logging;
