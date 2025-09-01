@@ -29,7 +29,9 @@ public static class DependencyInjection
         services.AddApplicationDependencies();
         services.AddAuthConfig(configuration);
         services.AddHangfireConfig(configuration);
-        
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         services
             .AddEndpointsApiExplorer()
             .AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
