@@ -10,3 +10,8 @@ global using Application.Interfaces.Infrastructure;
 global using System.Linq.Expressions;
 global using Domain.Abstraction;
 global using Domain.Constants;
+global using Domain.Repositories;
+global using Domain.Errors;
+global using Mapster;
+global using Microsoft.AspNetCore.Http;
+global using Infrastructure.Extensions;

@@ -113,8 +113,7 @@ public static class DependencyInjection
         #region Service Lifetime
 
         //services.AddScoped<IAuthService, AuthService>();
-        //services.AddScoped<IRoleService, RoleService>();
-        //services.AddScoped<ISignInService, SignInService>();
+        services.AddScoped<ISignInService, SignInService>();
 
         #endregion
 

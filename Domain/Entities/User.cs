@@ -7,7 +7,7 @@ public sealed class User
     public string LastName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
-    public string IsDisabled { get; set; } = string.Empty;
+    public bool IsDisabled { get; set; }
 
     public string FullName => $"{FirstName} {LastName}";
 }
