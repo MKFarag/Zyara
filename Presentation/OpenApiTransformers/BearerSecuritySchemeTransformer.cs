@@ -27,6 +27,7 @@ internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvi
             };
             document.Components ??= new OpenApiComponents();
             document.Components.SecuritySchemes = requirements;
+            document.Info.Title = "Zyara API | v1";
 
             foreach (var operation in document.Paths.Values.SelectMany(path => path.Operations))
             {
