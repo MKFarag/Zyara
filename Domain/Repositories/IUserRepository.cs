@@ -4,18 +4,18 @@ public interface IUserRepository
 {
     #region Read Operations
 
+    /// <summary>Finds a user by their unique identifier.</summary>
+    Task<User?> FindByIdAsync(string id, CancellationToken cancellationToken = default);
+
+    /// <summary>Finds a user by their email address.</summary>
+    Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken = default);
+
+    /// <summary>Finds a user by their username.</summary>
+    Task<User?> FindByUserNameAsync(string userName, CancellationToken cancellationToken = default);
+
     /// <summary>Get a user by their unique identifier with a custom projection.</summary>
     Task<TProjection?> GetProjectionAsync<TProjection>(string id, CancellationToken cancellationToken = default)
         where TProjection : class;
-
-    /// <summary>Finds a user by their unique identifier.</summary>
-    Task<User?> FindByIdAsync(string id);
-
-    /// <summary>Finds a user by their email address.</summary>
-    Task<User?> FindByEmailAsync(string email);
-
-    /// <summary>Finds a user by their username.</summary>
-    Task<User?> FindByUserNameAsync(string userName);
 
     /// <summary>Gets all users with their roles projected to a specific type.</summary>
     Task<IEnumerable<TProjection>> GetAllProjectionWithRolesAsync<TProjection>(bool includeDefaultRole, CancellationToken cancellationToken = default)

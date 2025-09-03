@@ -7,14 +7,26 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
 
     #region Read Operations
 
-    public async Task<User?> FindByIdAsync(string id)
-        => (await _userManager.FindByIdAsync(id))?.Adapt<User>();
+    public async Task<User?> FindByIdAsync(string id, CancellationToken cancellationToken = default)
+        => await _context.Users
+            .AsNoTracking()
+            .Where(u => u.Id == id)
+            .ProjectToType<User>()
+            .SingleOrDefaultAsync(cancellationToken);
 
-    public async Task<User?> FindByEmailAsync(string email)
-        => (await _userManager.FindByEmailAsync(email))?.Adapt<User>();
+    public async Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
+        => await _context.Users
+            .AsNoTracking()
+            .Where(u => u.NormalizedEmail == _userManager.NormalizeEmail(email))
+            .ProjectToType<User>()
+            .SingleOrDefaultAsync(cancellationToken);
 
-    public async Task<User?> FindByUserNameAsync(string userName)
-        => (await _userManager.FindByNameAsync(userName))?.Adapt<User>();
+    public async Task<User?> FindByUserNameAsync(string userName, CancellationToken cancellationToken = default)
+        => await _context.Users
+            .AsNoTracking()
+            .Where(u => u.NormalizedUserName == _userManager.NormalizeName(userName))
+            .ProjectToType<User>()
+            .SingleOrDefaultAsync(cancellationToken);
 
     public async Task<TProjection?> GetProjectionAsync<TProjection>(string id, CancellationToken cancellationToken = default)
         where TProjection : class
@@ -88,7 +100,11 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
     }
 
     public async Task<bool> IsEmailConfirmedAsync(User user)
-        => await _userManager.IsEmailConfirmedAsync(user.Adapt<ApplicationUser>());
+    {
+        var applicationUser = await GetByIdOrThrowAsync(user.Id);
+
+        return await _userManager.IsEmailConfirmedAsync(applicationUser);
+    }
 
     public async Task<bool> ExistsAsync(string userId, CancellationToken cancellationToken = default)
         => await _context.Users
@@ -265,10 +281,9 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
 
     public async Task<Result> RevokeRefreshTokenAsync(User user, string token, CancellationToken cancellationToken = default)
     {
-        var userRefreshToken = await _context.Users
-            .Where(u => u.Id == user.Id)
-            .SelectMany(u => u.RefreshTokens)
-            .SingleOrDefaultAsync(rt => rt.Token == token && rt.IsActive, cancellationToken);
+        var applicationUser = await GetByIdOrThrowAsync(user.Id);
+
+        var userRefreshToken = applicationUser.RefreshTokens.FirstOrDefault(rt => rt.Token == token && rt.IsActive);
 
         if (userRefreshToken is null)
             return Result.Failure(UserErrors.InvalidRefreshToken);

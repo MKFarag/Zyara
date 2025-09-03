@@ -1,6 +1,7 @@
 ﻿#region Usings
 
 using Application;
+using Application.Services;
 using Hangfire;
 using Infrastructure;
 using Infrastructure.Authentication;
@@ -115,7 +116,7 @@ public static class DependencyInjection
 
         #region Service Lifetime
 
-        //services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ISignInService, SignInService>();
 
         #endregion

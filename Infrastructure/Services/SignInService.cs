@@ -4,7 +4,7 @@ public class SignInService(SignInManager<ApplicationUser> signInManager, UserMan
 {
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
-
+    
     public async Task<Result<User>> PasswordSignInAsync(string identifier, string password, bool isPersistent, bool lockoutOnFailure)
     {
         if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(password))
@@ -40,7 +40,7 @@ public class SignInService(SignInManager<ApplicationUser> signInManager, UserMan
         }
     }
 
-    private static Error MapSignInError(Microsoft.AspNetCore.Identity.SignInResult result)
+    private static Error MapSignInError(SignInResult result)
         => result.IsNotAllowed ? UserErrors.EmailNotConfirmed
              : result.IsLockedOut ? UserErrors.LockedUser
              : UserErrors.InvalidCredentials;

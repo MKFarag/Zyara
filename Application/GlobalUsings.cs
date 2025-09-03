@@ -5,3 +5,8 @@ global using System.Linq.Expressions;
 global using Domain.Abstraction;
 global using Domain.Constants;
 global using Domain.Repositories;
+global using Application.Interfaces.Application;
+global using Application.Interfaces.Infrastructure;
+global using Application.Contracts.Auth;
+global using Domain.Errors;
+global using Microsoft.AspNetCore.Http;
