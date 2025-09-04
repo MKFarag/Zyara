@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddCORSConfig(configuration);
 
+        services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services

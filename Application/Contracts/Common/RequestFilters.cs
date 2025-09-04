@@ -21,11 +21,6 @@ public record RequestFilters
     public string? SearchValue { get; init; }
 
     /// <summary>
-    /// The name of the column to apply the search value against.
-    /// </summary>
-    public string? SearchColumn { get; init; }
-
-    /// <summary>
     /// The name of the column to sort by.
     /// </summary>
     public string? SortColumn { get; init; }
@@ -47,10 +42,6 @@ public class RequestFiltersValidator : AbstractValidator<RequestFilters>
 
         RuleFor(x => x.PageSize)
             .InclusiveBetween(1, 250);
-
-        RuleFor(x => x.SearchColumn)
-            .Matches(RegexPatterns.AlphanumericUnderscorePattern)
-            .WithMessage("Search column can only contain letters, numbers, and underscores.");
 
         RuleFor(x => x.SortColumn)
             .Matches(RegexPatterns.AlphanumericUnderscorePattern)

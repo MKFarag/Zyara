@@ -9,5 +9,7 @@ public sealed class Product
     public decimal CurrentPrice { get; set; }
     public decimal SellingPrice { get; set; }
 
+    public bool IsAvailable => StorageQuantity > 0;
+
     // TODO: Add ProductImage table and its navigation property
 }

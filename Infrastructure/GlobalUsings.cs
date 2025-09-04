@@ -17,3 +17,4 @@ global using Microsoft.AspNetCore.Http;
 global using Infrastructure.Extensions;
 global using Domain.Settings;
 global using Microsoft.Extensions.Logging;
+global using Infrastructure.Persistence.Common;
