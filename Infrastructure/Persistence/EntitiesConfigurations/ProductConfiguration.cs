@@ -17,5 +17,11 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder
             .Property(p => p.SellingPrice)
             .HasPrecision(10, 2);
+
+        // Index
+
+        builder
+            .HasIndex(x => x.Name)
+            .IsUnique();
     }
 }

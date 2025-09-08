@@ -4,7 +4,7 @@ public record ForgetPasswordRequest(
     string Email
 );
 
-#region Validator
+#region Validation
 
 public class ForgetPasswordRequestValidator : AbstractValidator<ForgetPasswordRequest>
 {

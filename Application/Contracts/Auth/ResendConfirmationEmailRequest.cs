@@ -4,7 +4,7 @@ public record ResendConfirmationEmailRequest(
     string Email
 );
 
-#region Validator
+#region Validation
 
 public class ResendConfirmationEmailRequestValidator : AbstractValidator<ResendConfirmationEmailRequest>
 {

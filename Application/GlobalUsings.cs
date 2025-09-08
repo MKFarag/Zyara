@@ -11,3 +11,4 @@ global using Application.Contracts.Auth;
 global using Domain.Errors;
 global using Microsoft.AspNetCore.Http;
 global using Application.Contracts.Common;
+global using Application.Contracts.Product;

@@ -5,7 +5,7 @@ public record RefreshTokenRequest(
     string RefreshToken
 );
 
-#region Validator
+#region Validation
 
 public class RefreshTokenRequestValidator : AbstractValidator<RefreshTokenRequest>
 {

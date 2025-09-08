@@ -5,7 +5,7 @@ public record ConfirmEmailRequest(
     string Token
 );
 
-#region Validator
+#region Validation
 
 public class ConfirmEmailRequestValidator : AbstractValidator<ConfirmEmailRequest>
 {
