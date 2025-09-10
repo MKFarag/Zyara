@@ -146,7 +146,9 @@ public class AuthService(IEmailTemplateService emailTemplateService, ISignInServ
 
         await _unitOfWork.Users.AddToRoleAsync(user, DefaultRoles.Customer.Name);
 
-        //TODO: Add the user to the Customers table
+        await _unitOfWork.Customers.AddAsync(new Customer { Id = user.Id });
+
+        await _unitOfWork.CompleteAsync();
 
         return Result.Success();
     }

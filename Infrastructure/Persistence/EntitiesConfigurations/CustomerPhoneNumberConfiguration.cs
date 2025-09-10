@@ -7,7 +7,7 @@ internal class CustomerPhoneNumberConfiguration : IEntityTypeConfiguration<Custo
         // Relationship with Customer
 
         builder
-            .HasOne(c => c.Customer)
+            .HasOne<Customer>()
             .WithMany(c => c.PhoneNumbers)
             .HasForeignKey(c => c.CustomerId);
 

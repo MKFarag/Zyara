@@ -2,6 +2,8 @@
 
 public interface IUnitOfWork : IDisposable
 {
+    IGenericRepository<Address, int> Addresses { get; }
+    ICustomerRepository Customers { get; }
     IGenericRepositoryWithPagination<Product, int> Products { get; }
     IRoleRepository Roles { get; }
     IUserRepository Users { get; }
