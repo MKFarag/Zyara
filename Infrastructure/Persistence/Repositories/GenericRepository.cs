@@ -43,6 +43,46 @@ public class GenericRepository<TEntity, TKey>(ApplicationDbContext context) : IG
     public async Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
         => await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
 
+    public TEntity? Find(Expression<Func<TEntity, bool>> predicate, string[] includes)
+    {
+        IQueryable<TEntity> query = _dbSet.AsNoTracking().Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return query.FirstOrDefault();
+    }
+
+    public async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default)
+    {
+        IQueryable<TEntity> query = _dbSet.AsNoTracking().Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public TEntity? TrackedFind(Expression<Func<TEntity, bool>> predicate, string[] includes)
+    {
+        IQueryable<TEntity> query = _dbSet.Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return query.FirstOrDefault();
+    }
+
+    public async Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default)
+    {
+        IQueryable<TEntity> query = _dbSet.Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
     public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
         => _dbSet.AsNoTracking().Where(predicate);
 

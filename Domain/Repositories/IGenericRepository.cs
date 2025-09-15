@@ -54,6 +54,28 @@ public interface IGenericRepository<TEntity, TKey>
     /// <param name="cancellationToken">Cancellation token</param>
     Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
+    /// <summary>Find first entity matching condition</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
+    TEntity? Find(Expression<Func<TEntity, bool>> predicate, string[] includes);
+
+    /// <summary>Find first entity matching condition</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
+
+    /// <summary>Find first trackable entity matching condition</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
+    TEntity? TrackedFind(Expression<Func<TEntity, bool>> predicate, string[] includes);
+
+    /// <summary>Find first trackable entity matching condition</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
+
     /// <summary>Find all entities matching condition</summary>
     /// <param name="predicate">Filter condition</param>
     IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate);

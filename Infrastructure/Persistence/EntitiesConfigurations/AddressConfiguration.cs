@@ -8,8 +8,8 @@ internal class AddressConfiguration : IEntityTypeConfiguration<Address>
 
         builder
             .HasOne<Customer>()
-            .WithOne(c => c.DefaultAddress)
-            .HasForeignKey<Address>(a => a.CustomerId);
+            .WithMany(a => a.Addresses)
+            .HasForeignKey(a => a.CustomerId);
 
         //////////////////////////////////////////////////////////////////////////
 
