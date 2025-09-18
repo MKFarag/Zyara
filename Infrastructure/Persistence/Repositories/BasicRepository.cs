@@ -1,0 +1,109 @@
+﻿namespace Infrastructure.Persistence.Repositories;
+
+public class BasicRepository<TEntity>(ApplicationDbContext context) : IBasicRepository<TEntity> where TEntity : class
+{
+    private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
+
+    #region Read
+
+    public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
+        => await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
+
+    public async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+        => await _dbSet.AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken);
+
+    public async Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+        => await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
+
+    public async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default)
+    {
+        IQueryable<TEntity> query = _dbSet.AsNoTracking().Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default)
+    {
+        IQueryable<TEntity> query = _dbSet.Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+        => await _dbSet.AsNoTracking().Where(predicate).ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<TEntity>> TrackedFindAllAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+        => await _dbSet.Where(predicate).ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default)
+    {
+        IQueryable<TEntity> query = _dbSet.AsNoTracking().Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return await query.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(CancellationToken cancellationToken = default) where TProjection : class
+        => await _dbSet.AsNoTracking().ProjectToType<TProjection>().ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default)
+        => distinct
+            ? await _dbSet.AsNoTracking().Select(selector).Distinct().ToListAsync(cancellationToken)
+            : await _dbSet.AsNoTracking().Select(selector).ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default) where TProjection : class
+        => await _dbSet.AsNoTracking().Where(predicate).ProjectToType<TProjection>().ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default)
+        => distinct
+            ? await _dbSet.AsNoTracking().Where(predicate).Select(selector).Distinct().ToListAsync(cancellationToken)
+            : await _dbSet.AsNoTracking().Where(predicate).Select(selector).ToListAsync(cancellationToken);
+
+    #endregion
+
+    #region Modify
+
+    public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+    {
+        await _dbSet.AddAsync(entity, cancellationToken);
+        return entity;
+    }
+
+    public async Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    {
+        await _dbSet.AddRangeAsync(entities, cancellationToken);
+        return entities;
+    }
+
+    public void Delete(TEntity entity)
+    => _dbSet.Remove(entity);
+
+    public void DeleteRange(IEnumerable<TEntity> entities)
+        => _dbSet.RemoveRange(entities);
+
+    public TEntity Update(TEntity entity)
+    {
+        _dbSet.Update(entity);
+        return entity;
+    }
+
+    public IEnumerable<TEntity> UpdateRange(IEnumerable<TEntity> entities)
+    {
+        _dbSet.UpdateRange(entities);
+        return entities;
+    }
+
+    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+        => await _dbSet.AnyAsync(predicate, cancellationToken);
+
+
+    #endregion
+}

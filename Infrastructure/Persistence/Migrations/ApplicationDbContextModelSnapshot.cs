@@ -59,7 +59,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Cart", b =>
@@ -80,7 +80,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Customer", b =>
@@ -90,7 +90,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CustomerPhoneNumber", b =>
@@ -107,7 +107,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("CustomerId", "PhoneNumber");
 
-                    b.ToTable("CustomerPhoneNumbers");
+                    b.ToTable("CustomerPhoneNumbers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DeliveryMan", b =>
@@ -133,7 +133,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
-                    b.ToTable("DeliveryMen");
+                    b.ToTable("DeliveryMen", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -174,7 +174,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ShippingAddressId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderItem", b =>
@@ -204,7 +204,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Product", b =>
@@ -240,7 +240,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Persistence.Identities.ApplicationRole", b =>
