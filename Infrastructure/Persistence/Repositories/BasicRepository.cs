@@ -6,9 +6,6 @@ public class BasicRepository<TEntity>(ApplicationDbContext context) : IBasicRepo
 
     #region Read
 
-    public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
-        => await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
-
     public async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
         => await _dbSet.AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken);
 
@@ -51,13 +48,15 @@ public class BasicRepository<TEntity>(ApplicationDbContext context) : IBasicRepo
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(CancellationToken cancellationToken = default) where TProjection : class
-        => await _dbSet.AsNoTracking().ProjectToType<TProjection>().ToListAsync(cancellationToken);
+    public async Task<IEnumerable<TEntity>> TrackedFindAllAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default)
+    {
+        IQueryable<TEntity> query = _dbSet.Where(predicate);
 
-    public async Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default)
-        => distinct
-            ? await _dbSet.AsNoTracking().Select(selector).Distinct().ToListAsync(cancellationToken)
-            : await _dbSet.AsNoTracking().Select(selector).ToListAsync(cancellationToken);
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return await query.ToListAsync(cancellationToken);
+    }
 
     public async Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default) where TProjection : class
         => await _dbSet.AsNoTracking().Where(predicate).ProjectToType<TProjection>().ToListAsync(cancellationToken);
@@ -66,6 +65,30 @@ public class BasicRepository<TEntity>(ApplicationDbContext context) : IBasicRepo
         => distinct
             ? await _dbSet.AsNoTracking().Where(predicate).Select(selector).Distinct().ToListAsync(cancellationToken)
             : await _dbSet.AsNoTracking().Where(predicate).Select(selector).ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default)where TProjection : class
+    {
+        IQueryable<TEntity> query = _dbSet.AsNoTracking().Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return await query.ProjectToType<TProjection>().ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, string[] includes, Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default)
+    {
+        IQueryable<TEntity> query = _dbSet.AsNoTracking().Where(predicate);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        var newQuery = query.Select(selector);
+
+        return distinct
+            ? await newQuery.Distinct().ToListAsync(cancellationToken)
+            : await newQuery.ToListAsync(cancellationToken);
+    }
 
     #endregion
 

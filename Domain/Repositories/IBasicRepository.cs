@@ -7,10 +7,6 @@ public interface IBasicRepository<TEntity> where TEntity : class
 {
     #region Read
 
-    /// <summary>Get all entities</summary>
-    /// <param name="cancellationToken">Cancellation token</param>
-    Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
-
     /// <summary>Find first entity matching condition</summary>
     /// <param name="predicate">Filter condition</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -38,7 +34,7 @@ public interface IBasicRepository<TEntity> where TEntity : class
     /// <param name="cancellationToken">Cancellation token</param>
     Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
-    /// <summary>Find all trackable entities matching condition (async)</summary>
+    /// <summary>Find all trackable entities matching condition</summary>
     /// <param name="predicate">Filter condition</param>
     /// <param name="cancellationToken">Cancellation token</param>
     Task<IEnumerable<TEntity>> TrackedFindAllAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
@@ -49,16 +45,11 @@ public interface IBasicRepository<TEntity> where TEntity : class
     /// <param name="cancellationToken">Cancellation token</param>
     Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
 
-    /// <summary>Get all entities with your DTO</summary>
-    /// <typeparam name="TProjection">The type of the projection</typeparam>
+    /// <summary>Find all trackable entities matching condition with related data</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(CancellationToken cancellationToken = default) where TProjection : class;
-
-    /// <summary>Get all entities with custom projection</summary>
-    /// <param name="selector">Custom projection expression</param>
-    /// <param name="distinct">Apply distinct to results</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default);
+    Task<IEnumerable<TEntity>> TrackedFindAllAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
 
     /// <summary>Find all entities with your DTO</summary>
     /// <param name="predicate">Filter condition</param>
@@ -72,6 +63,20 @@ public interface IBasicRepository<TEntity> where TEntity : class
     /// <param name="cancellationToken">Cancellation token</param>
     Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default);
 
+    /// <summary>Find all entities with your DTO and related data</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default) where TProjection : class;
+
+    /// <summary>Find all entities with your DTO and related data</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
+    /// <param name="selector">Custom projection expression</param>
+    /// <param name="distinct">Apply distinct to results</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, string[] includes, Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default);
+    
     #endregion
 
     #region Modify
