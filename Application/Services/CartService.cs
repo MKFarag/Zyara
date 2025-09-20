@@ -1,5 +1,4 @@
 ﻿using Application.Contracts.Cart;
-using System.Threading;
 
 namespace Application.Services;
 
@@ -34,7 +33,7 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         return Result.Success(response);
     }
 
-    public async Task<Result> AddProductAsync(string customerId, int productId, int quantity, CancellationToken cancellationToken = default)
+    public async Task<Result> AddAsync(string customerId, int productId, int quantity, CancellationToken cancellationToken = default)
     {
         if (!await _unitOfWork.Customers.ExistsAsync(customerId, cancellationToken))
             return Result.Failure(CustomerErrors.NotFound);
@@ -42,15 +41,29 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         if (!await _unitOfWork.Products.ExistsAsync(productId, cancellationToken))
             return Result.Failure(ProductErrors.NotFound);
 
-        if (await _unitOfWork.Carts.AnyAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken))
-            return Result.Failure(CustomerErrors.Cart.ProductNotFound);
+        var cart = await _unitOfWork.Carts
+            .TrackedFindAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken);
 
-        await _unitOfWork.Carts.ExecuteDeleteAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken);
+        if (cart is null)
+        {
+            cart = new Cart
+            {
+                CustomerId = customerId,
+                ProductId = productId,
+                Quantity = quantity
+            };
+
+            await _unitOfWork.Carts.AddAsync(cart, cancellationToken);
+        }
+        else
+            cart.Quantity += quantity;
+
+        await _unitOfWork.CompleteAsync(cancellationToken);
 
         return Result.Success();
     }
 
-    public async Task<Result> ClearAsync(string customerId, int productId, CancellationToken cancellationToken = default)
+    public async Task<Result> DeleteAsync(string customerId, int productId, CancellationToken cancellationToken = default)
     {
         if (!await _unitOfWork.Customers.ExistsAsync(customerId, cancellationToken))
             return Result.Failure(CustomerErrors.NotFound);
@@ -62,6 +75,35 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
             return Result.Failure(CustomerErrors.Cart.ProductNotFound);
 
         await _unitOfWork.Carts.ExecuteDeleteAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> DeleteAsync(string customerId, int productId, int quantity, CancellationToken cancellationToken = default)
+    {
+        if (!await _unitOfWork.Customers.ExistsAsync(customerId, cancellationToken))
+            return Result.Failure(CustomerErrors.NotFound);
+
+        if (!await _unitOfWork.Products.ExistsAsync(productId, cancellationToken))
+            return Result.Failure(ProductErrors.NotFound);
+
+        if (await _unitOfWork.Carts
+            .TrackedFindAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken) is not { } cart)
+            return Result.Failure(CustomerErrors.Cart.ProductNotFound);
+
+        cart.Quantity -= quantity;
+
+        switch (cart.Quantity)
+        {
+            case < 0:
+                return Result.Failure(CustomerErrors.Cart.QuantityLessThanZero);
+            case 0:
+                await _unitOfWork.Carts.ExecuteDeleteAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken);
+                break;
+            default:
+                await _unitOfWork.CompleteAsync(cancellationToken);
+                break;
+        }
 
         return Result.Success();
     }

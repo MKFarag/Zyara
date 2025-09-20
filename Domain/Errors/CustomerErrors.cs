@@ -31,6 +31,9 @@ public record CustomerErrors
     {
         public static readonly Error ProductNotFound =
             new("Cart.ProductNotFound", "The customer didn't add this product", StatusCodes.NotFound);
+
+        public static readonly Error QuantityLessThanZero =
+            new("Cart.QuantityLessThanZero", "The quantity cannot be decreased below you have", StatusCodes.NotFound);
     }
 
     public static readonly Error NotFound =
