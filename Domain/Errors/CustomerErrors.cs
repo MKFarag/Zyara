@@ -27,6 +27,11 @@ public record CustomerErrors
         public static readonly Error Duplicated =
             new("PhoneNumber.Duplicated", "You added this phone number before", StatusCodes.Conflict);
     }
+    public partial record Cart
+    {
+        public static readonly Error ProductNotFound =
+            new("Cart.ProductNotFound", "The customer didn't add this product", StatusCodes.NotFound);
+    }
 
     public static readonly Error NotFound =
         new("Customer.NotFound", "No customer found", StatusCodes.NotFound);

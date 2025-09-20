@@ -1,4 +1,5 @@
 ﻿using Application.Contracts.Cart;
+using System.Threading;
 
 namespace Application.Services;
 
@@ -6,8 +7,11 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<CartResponse> GetAsync(string customerId, CancellationToken cancellationToken = default)
+    public async Task<Result<CartResponse>> GetAsync(string customerId, CancellationToken cancellationToken = default)
     {
+        if (!await _unitOfWork.Customers.ExistsAsync(customerId, cancellationToken))
+            return Result.Failure<CartResponse>(CustomerErrors.NotFound);
+
         var cart = await _unitOfWork.Carts
             .FindAllAsync(c => c.CustomerId == customerId, [nameof(Cart.Product)], cancellationToken);
 
@@ -15,7 +19,7 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
 
         cart = [.. cart.OrderByDescending(c => c.AddedAt)];
 
-        return new CartResponse
+        var response = new CartResponse
         (
             [.. cart.Select(c => new CartProductResponse
             (
@@ -26,10 +30,49 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
             ))],
             totalPrice
         );
+
+        return Result.Success(response);
     }
 
-    public Task ClearAsync(string customerId, CancellationToken cancellationToken = default)
+    public async Task<Result> AddProductAsync(string customerId, int productId, int quantity, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (!await _unitOfWork.Customers.ExistsAsync(customerId, cancellationToken))
+            return Result.Failure(CustomerErrors.NotFound);
+
+        if (!await _unitOfWork.Products.ExistsAsync(productId, cancellationToken))
+            return Result.Failure(ProductErrors.NotFound);
+
+        if (await _unitOfWork.Carts.AnyAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken))
+            return Result.Failure(CustomerErrors.Cart.ProductNotFound);
+
+        await _unitOfWork.Carts.ExecuteDeleteAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ClearAsync(string customerId, int productId, CancellationToken cancellationToken = default)
+    {
+        if (!await _unitOfWork.Customers.ExistsAsync(customerId, cancellationToken))
+            return Result.Failure(CustomerErrors.NotFound);
+
+        if (!await _unitOfWork.Products.ExistsAsync(productId, cancellationToken))
+            return Result.Failure(ProductErrors.NotFound);
+
+        if (!await _unitOfWork.Carts.AnyAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken))
+            return Result.Failure(CustomerErrors.Cart.ProductNotFound);
+
+        await _unitOfWork.Carts.ExecuteDeleteAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ClearAsync(string customerId, CancellationToken cancellationToken = default)
+    {
+        if (!await _unitOfWork.Customers.ExistsAsync(customerId, cancellationToken))
+            return Result.Failure(CustomerErrors.NotFound);
+
+        await _unitOfWork.Carts.ExecuteDeleteAsync(c => c.CustomerId == customerId, cancellationToken);
+
+        return Result.Success();
     }
 }

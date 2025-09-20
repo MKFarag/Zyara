@@ -14,6 +14,9 @@ public class CartRepository(ApplicationDbContext context) : ICartRepository
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task BulkDeleteAsync(Expression<Func<Cart, bool>> predicate, CancellationToken cancellationToken = default)
+    public async Task ExecuteDeleteAsync(Expression<Func<Cart, bool>> predicate, CancellationToken cancellationToken = default)
         => await _context.Carts.Where(predicate).ExecuteDeleteAsync(cancellationToken);
+
+    public async Task<bool> AnyAsync(Expression<Func<Cart, bool>> predicate, CancellationToken cancellationToken = default)
+        => await _context.Carts.AnyAsync(predicate, cancellationToken);
 }
