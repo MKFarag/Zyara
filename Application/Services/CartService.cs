@@ -28,8 +28,8 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         );
     }
 
-    public async Task ClearAsync(string customerId, CancellationToken cancellationToken = default)
+    public Task ClearAsync(string customerId, CancellationToken cancellationToken = default)
     {
-
+        throw new NotImplementedException();
     }
 }
