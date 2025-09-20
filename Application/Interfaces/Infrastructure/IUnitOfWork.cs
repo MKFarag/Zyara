@@ -3,7 +3,7 @@
 public interface IUnitOfWork : IDisposable
 {
     IGenericRepository<Address, int> Addresses { get; }
-    ICartRepository Carts { get; }
+    IBasicRepository<Cart> Carts { get; }
     ICustomerRepository Customers { get; }
     IGenericRepositoryWithPagination<Product, int> Products { get; }
     IRoleRepository Roles { get; }
