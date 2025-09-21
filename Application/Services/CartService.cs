@@ -38,8 +38,14 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         if (!await _unitOfWork.Customers.ExistsAsync(customerId, cancellationToken))
             return Result.Failure(CustomerErrors.NotFound);
 
-        if (!await _unitOfWork.Products.ExistsAsync(productId, cancellationToken))
+        if (await _unitOfWork.Products.GetAsync(productId, cancellationToken) is not { } product)
             return Result.Failure(ProductErrors.NotFound);
+
+        if (!product.IsAvailable)
+            return Result.Failure(ProductErrors.NotAvailable);
+
+        if (quantity > product.StorageQuantity)
+            return Result.Failure(CustomerErrors.Cart.QuantityExceedsStock);
 
         var cart = await _unitOfWork.Carts
             .TrackedFindAsync(c => c.CustomerId == customerId && c.ProductId == productId, cancellationToken);
@@ -57,6 +63,9 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         }
         else
             cart.Quantity += quantity;
+
+        if (cart.Quantity > product.StorageQuantity)
+            return Result.Failure(CustomerErrors.Cart.QuantityExceedsStock);
 
         await _unitOfWork.CompleteAsync(cancellationToken);
 

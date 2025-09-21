@@ -44,17 +44,7 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
         return response;
     }
 
-    public async Task<Result<ProductResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
-    {
-        if (await _unitOfWork.Products.GetAsync(id, cancellationToken) is not { } product)
-            return Result.Failure<ProductResponse>(ProductErrors.NotFound);
-
-        var response = product.Adapt<ProductResponse>();
-
-        return Result.Success(response);
-    }
-
-    public async Task<Result<ProductDetailsResponse>> GetDetailsAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Result<ProductDetailsResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
     {
         if (await _unitOfWork.Products.GetAsync(id, cancellationToken) is not { } product)
             return Result.Failure<ProductDetailsResponse>(ProductErrors.NotFound);

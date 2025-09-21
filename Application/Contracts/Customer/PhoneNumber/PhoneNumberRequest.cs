@@ -12,7 +12,9 @@ public class PhoneNumberRequestValidator : AbstractValidator<PhoneNumberRequest>
     {
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()
-            .Length(11);
+            .Length(11)
+            .Matches(RegexPatterns.OnlyNumbers)
+            .WithMessage("PhoneNumber must have only number");
     }
 }
 

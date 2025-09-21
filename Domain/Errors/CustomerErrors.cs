@@ -34,6 +34,9 @@ public record CustomerErrors
 
         public static readonly Error QuantityLessThanZero =
             new("Cart.QuantityLessThanZero", "The quantity cannot be decreased below you have", StatusCodes.NotFound);
+
+        public static readonly Error QuantityExceedsStock =
+            new("Cart.QuantityExceedsStock", "The quantity cannot be more than storage stock", StatusCodes.NotFound);
     }
 
     public static readonly Error NotFound =

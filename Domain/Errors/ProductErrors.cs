@@ -5,6 +5,9 @@ public record ProductErrors
     public static readonly Error NotFound =
         new("Product.NotFound", "No product found", StatusCodes.NotFound);
 
+    public static readonly Error NotAvailable =
+        new("Product.NotAvailable", "This product is not available", StatusCodes.NotFound);
+
     public static readonly Error DuplicatedName =
         new("Product.DuplicatedName", "This name is already taken", StatusCodes.Conflict);
 

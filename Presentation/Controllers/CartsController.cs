@@ -50,7 +50,7 @@ public class CartsController(ICartService cartService) : ControllerBase
     }
 
     [HttpDelete("")]
-    public async Task<IActionResult> Delete(CancellationToken cancellationToken)
+    public async Task<IActionResult> Clear(CancellationToken cancellationToken)
     {
         var result = await _cartService.ClearAsync(User.GetId()!, cancellationToken);
 

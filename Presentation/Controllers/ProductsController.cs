@@ -26,19 +26,6 @@ public class ProductsController(IProductService productService) : ControllerBase
             : result.ToProblem();
     }
 
-    [HttpGet("{id}/details")]
-    public async Task<IActionResult> GetDetails([FromRoute] int id, CancellationToken cancellationToken)
-    {
-        if (id <= 0)
-            return BadRequest();
-
-        var result = await _productService.GetDetailsAsync(id, cancellationToken);
-
-        return result.IsSuccess
-            ? Ok(result.Value)
-            : result.ToProblem();
-    }
-
     [HttpPost("")]
     public async Task<IActionResult> Add([FromBody] ProductRequest request, CancellationToken cancellationToken)
     {
