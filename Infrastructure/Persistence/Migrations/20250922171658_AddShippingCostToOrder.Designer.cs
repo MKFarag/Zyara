@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250922151630_AddShippingCostColumnToOrder")]
-    partial class AddShippingCostColumnToOrder
+    [Migration("20250922171658_AddShippingCostToOrder")]
+    partial class AddShippingCostToOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,7 +164,7 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("ShippingCost")
+                    b.Property<decimal?>("ShippingCost")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 

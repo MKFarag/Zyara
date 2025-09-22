@@ -161,7 +161,7 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("ShippingCost")
+                    b.Property<decimal?>("ShippingCost")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 

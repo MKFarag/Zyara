@@ -10,6 +10,11 @@ public sealed class Address
     public string? Note { get; set; }
     public bool IsDefault { get; set; }
 
-    public override string ToString() => $"{Governorate}, {City}, {Street}" + 
-        ((string.IsNullOrWhiteSpace(Note)) ? string.Empty : $".\nNote: {Note}");
+    public override string ToString() 
+        => $"{Governorate}, {City}, {Street}" + 
+        (
+            (string.IsNullOrWhiteSpace(Note))
+            ? string.Empty
+            : $".\nNote: {Note}"
+        );
 }

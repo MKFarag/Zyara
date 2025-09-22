@@ -5,7 +5,7 @@
 namespace Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddShippingCostColumnToOrder : Migration
+    public partial class AddShippingCostToOrder : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,8 +16,7 @@ namespace Infrastructure.Persistence.Migrations
                 type: "decimal(10,2)",
                 precision: 10,
                 scale: 2,
-                nullable: false,
-                defaultValue: 0m);
+                nullable: true);
         }
 
         /// <inheritdoc />

@@ -8,6 +8,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder
             .Property(o => o.Status)
+            .HasConversion<string>()
             .HasMaxLength(50);
 
         builder
