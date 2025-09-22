@@ -13,7 +13,9 @@ public sealed class Address
     public override string ToString() 
         => $"{Governorate}, {City}, {Street}" + 
         (
-            (string.IsNullOrWhiteSpace(Note))
+            (string.IsNullOrEmpty(Note))
+            ? string.Empty
+            : string.IsNullOrWhiteSpace(Note)
             ? string.Empty
             : $".\nNote: {Note}"
         );
