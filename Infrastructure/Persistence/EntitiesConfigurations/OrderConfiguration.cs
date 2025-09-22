@@ -13,5 +13,9 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder
             .Property(o => o.TotalAmount)
             .HasPrecision(10, 2);
+
+        builder
+            .Property(o => o.ShippingCost)
+            .HasPrecision(10, 2);
     }
 }
