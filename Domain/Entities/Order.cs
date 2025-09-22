@@ -6,11 +6,10 @@ public sealed class Order
     public string CustomerId { get; set; } = string.Empty;
     public DateTime OrderDate { get; set; } = DateTime.UtcNow;
     public decimal TotalAmount { get; set; }
-    public int DeliveryManId { get; set; }
+    public int? DeliveryManId { get; set; }
     public string Status { get; set; } = default!;
-    public int ShippingAddressId { get; set; }
+    public string ShippingAddress { get; set; } = string.Empty;
 
     public Customer Customer { get; set; } = default!;
-    public DeliveryMan DeliveryMan { get; set; } = default!;
-    public Address ShippingAddress { get; set; } = default!;
+    public DeliveryMan? DeliveryMan { get; set; } = default!;
 }
