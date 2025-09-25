@@ -12,3 +12,7 @@ global using Domain.Errors;
 global using Microsoft.AspNetCore.Http;
 global using Application.Contracts.Common;
 global using Application.Contracts.Product;
+global using Application.Contracts.Order;
+global using Application.Contracts.Cart;
+global using Application.Contracts.Customer;
+global using Application.Contracts.DeliveryMan;

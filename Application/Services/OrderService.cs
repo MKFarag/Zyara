@@ -1,10 +1,71 @@
-﻿using Application.Contracts.Order;
-
-namespace Application.Services;
+﻿namespace Application.Services;
 
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+    public async Task<Result<IEnumerable<OrderResponse>>> GetAllAsync(string customerId, CancellationToken cancellationToken = default)
+    {
+        var customer = await _unitOfWork.Customers
+            .FindAsync
+            (
+                c => c.Id == customerId,
+                [$"{nameof(Customer.Orders)}.{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
+                cancellationToken
+            );
+
+        if (customer is null)
+            return Result.Failure<IEnumerable<OrderResponse>>(CustomerErrors.NotFound);
+
+        if (customer.Orders.Count == 0)
+            return Result.Success<IEnumerable<OrderResponse>>([]);
+
+        var response = customer.Orders.Adapt<IEnumerable<OrderResponse>>();
+
+        return Result.Success(response); 
+    }
+   
+    public async Task<Result<OrderResponse>> GetAsync(string customerId, int orderId, CancellationToken cancellationToken = default)
+    {
+        var order = await _unitOfWork.Orders
+            .FindAsync
+            (
+                o => o.Id == orderId,
+                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
+                cancellationToken
+            );
+
+        if (order is null)
+            return Result.Failure<OrderResponse>(OrderErrors.NotFound);
+
+        if (order.CustomerId != customerId)
+            return Result.Failure<OrderResponse>(OrderErrors.AccessDenied);
+
+        var response = order.Adapt<OrderResponse>();
+
+        return Result.Success(response); 
+    }
+
+    public async Task<Result<OrderStatusResponse>> TrackAsync(string customerId, int orderId, CancellationToken cancellationToken = default)
+    {
+        var order = await _unitOfWork.Orders
+            .FindAsync
+            (
+                o => o.Id == orderId,
+                [nameof(Order.DeliveryMan)],
+                cancellationToken
+            );
+
+        if (order is null)
+            return Result.Failure<OrderStatusResponse>(OrderErrors.NotFound);
+
+        if (order.CustomerId != customerId)
+            return Result.Failure<OrderStatusResponse>(OrderErrors.AccessDenied);
+
+        var response = order.Adapt<OrderStatusResponse>();
+
+        return Result.Success(response);
+    }
 
     public async Task<Result> PlaceOrderAsync(string customerId, CancellationToken cancellationToken = default)
     {
@@ -34,6 +95,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
         var totalPrice = customer.CartItems.Sum(c => c.Product.CurrentPrice * c.Quantity);
 
+        if (customer.CartItems.Any(x => !x.Product.IsAvailable))
+            return Result.Failure(ProductErrors.NotAvailable);
+
         var order = new Order
         {
             CustomerId = customer.Id,
@@ -61,6 +125,35 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         }
 
         _unitOfWork.Carts.DeleteRange(customer.CartItems);
+
+        await _unitOfWork.CompleteAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> CancelAsync(string customerId, int orderId, CancellationToken cancellationToken = default)
+    {
+        var order = await _unitOfWork.Orders
+            .TrackedFindAsync
+            (
+                o => o.Id == orderId,
+                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
+                cancellationToken
+            );
+
+        if (order is null)
+            return Result.Failure(OrderErrors.NotFound);
+
+        if (order.CustomerId != customerId)
+            return Result.Failure(OrderErrors.AccessDenied);
+
+        if (order.Status is not OrderStatus.Pending)
+            return Result.Failure(OrderErrors.CannotBeCancelled);
+
+        order.Status = OrderStatus.Canceled;
+
+        foreach (var item in order.OrderItems)
+            item.Product.StorageQuantity += item.Quantity;
 
         await _unitOfWork.CompleteAsync(cancellationToken);
 

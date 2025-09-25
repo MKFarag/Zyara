@@ -6,5 +6,6 @@ public sealed class Customer
 
     public ICollection<Address> Addresses { get; set; } = [];
     public ICollection<Cart> CartItems { get; set; } = [];
+    public ICollection<Order> Orders { get; set; } = [];
     public ICollection<CustomerPhoneNumber> PhoneNumbers { get; set; } = []; 
 }
