@@ -2,6 +2,7 @@
 
 public interface ICustomerRepository : IGenericRepository<Customer, string>
 {
+    Task<string?> GetPrimaryPhoneNumberAsync(string id, CancellationToken cancellationToken = default);
     void Delete(Address address);
     void Delete(CustomerPhoneNumber customerPhoneNumber);
 }

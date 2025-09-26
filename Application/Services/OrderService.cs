@@ -4,25 +4,20 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Result<IEnumerable<OrderResponse>>> GetAllAsync(string customerId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<OrderResponse>> GetAllAsync(string customerId, int year, CancellationToken cancellationToken = default)
     {
-        var customer = await _unitOfWork.Customers
-            .FindAsync
+        if (year < 2025)
+            return [];
+
+        var orders = await _unitOfWork.Orders
+            .FindAllAsync
             (
-                c => c.Id == customerId,
-                [$"{nameof(Customer.Orders)}.{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
+                o => o.CustomerId == customerId && o.OrderDate.Year == year,
+                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
                 cancellationToken
             );
 
-        if (customer is null)
-            return Result.Failure<IEnumerable<OrderResponse>>(CustomerErrors.NotFound);
-
-        if (customer.Orders.Count == 0)
-            return Result.Success<IEnumerable<OrderResponse>>([]);
-
-        var response = customer.Orders.Adapt<IEnumerable<OrderResponse>>();
-
-        return Result.Success(response); 
+        return orders.Adapt<IEnumerable<OrderResponse>>(); 
     }
    
     public async Task<Result<OrderResponse>> GetAsync(string customerId, int orderId, CancellationToken cancellationToken = default)

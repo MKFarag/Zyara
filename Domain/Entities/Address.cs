@@ -11,12 +11,12 @@ public sealed class Address
     public bool IsDefault { get; set; }
 
     public override string ToString() 
-        => $"{Governorate}, {City}, {Street}" + 
+        => $"{Governorate}, {City}, {Street}." + 
         (
             (string.IsNullOrEmpty(Note))
             ? string.Empty
             : string.IsNullOrWhiteSpace(Note)
             ? string.Empty
-            : $".\nNote: {Note}"
+            : $" Note: {Note}"
         );
 }

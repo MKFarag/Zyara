@@ -8,13 +8,12 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     private readonly IOrderService _orderService = orderService;
 
     [HttpGet("")]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll([FromQuery] int year, CancellationToken cancellationToken)
     {
-        var result = await _orderService.GetAllAsync(User.GetId()!, cancellationToken);
+        if (year < 0)
+            return BadRequest("Year must be a positive number");
 
-        return result.IsSuccess
-            ? Ok(result.Value)
-            : result.ToProblem();
+        return Ok(await _orderService.GetAllAsync(User.GetId()!, year, cancellationToken));
     }
 
     [HttpGet("{id}")]

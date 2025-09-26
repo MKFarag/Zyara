@@ -2,7 +2,7 @@
 
 public record OrderResponse(
     int Id,
-    DateTime OrderDate,
+    DateOnly OrderDate,
     decimal? ShippingCost,
     decimal TotalAmount,
     string ShippingAddress,
