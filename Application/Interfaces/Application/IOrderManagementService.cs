@@ -4,4 +4,5 @@ public interface IOrderManagementService
 {
     Task<IEnumerable<OrderResponse>> GetAllByStatusAsync(OrderStatusRequest request, CancellationToken cancellationToken = default);
     Task<Result<OrderDetailsResponse>> GetAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result> ChangeStatusAsync(int id, OrderStatusRequest request, CancellationToken cancellationToken = default);
 }

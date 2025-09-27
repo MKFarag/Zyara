@@ -3,10 +3,11 @@
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly int _developedYear = 2025;
 
     public async Task<IEnumerable<OrderResponse>> GetAllAsync(string customerId, int year, CancellationToken cancellationToken = default)
     {
-        if (year < 2025)
+        if (year < _developedYear)
             return [];
 
         var orders = await _unitOfWork.Orders

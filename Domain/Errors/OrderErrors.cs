@@ -8,6 +8,9 @@ public static class OrderErrors
     public static readonly Error EmptyCart =
         new("Order.EmptyCart", "The cart is empty", StatusCodes.NotFound);
 
+    public static readonly Error InvalidStatus =
+        new("Order.InvalidStatus", "Invalid status", StatusCodes.BadRequest);
+
     public static readonly Error AccessDenied =
         new("Order.AccessDenied", "This order is for another customer", StatusCodes.Forbidden);
 

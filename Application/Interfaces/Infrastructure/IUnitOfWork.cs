@@ -5,7 +5,8 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<Address, int> Addresses { get; }
     IBasicRepository<Cart> Carts { get; }
     ICustomerRepository Customers { get; }
-    IGenericRepository<Order, int> Orders { get; }
+    IGenericRepository<DeliveryMan, int> DeliveryMen { get; }
+    IGenericRepositoryWithPagination<Order, int> Orders { get; }
     IGenericRepository<OrderItem, int> OrderItems { get; }
     IGenericRepositoryWithPagination<Product, int> Products { get; }
     IRoleRepository Roles { get; }
