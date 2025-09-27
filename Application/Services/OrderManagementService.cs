@@ -4,8 +4,11 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<IEnumerable<OrderResponse>> GetAllByStatusAsync(OrderStatus status, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<OrderResponse>> GetAllByStatusAsync(OrderStatusRequest request, CancellationToken cancellationToken = default)
     {
+        if (!Enum.TryParse<OrderStatus>(request.Status, true, out var status))
+            return [];
+
         var orders = await _unitOfWork.Orders
             .FindAllAsync
             (   o => o.Status == status,
@@ -37,4 +40,6 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
 
         return Result.Success(response);
     }
+
+
 }

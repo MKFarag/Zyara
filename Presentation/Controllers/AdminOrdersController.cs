@@ -1,5 +1,4 @@
 ﻿using Application.Contracts.Order;
-using Domain.Constants;
 
 namespace Presentation.Controllers;
 
@@ -12,12 +11,7 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
 
     [HttpGet("")]
     public async Task<IActionResult> GetAll([FromBody] OrderStatusRequest request, CancellationToken cancellationToken)
-    {
-        if (!Enum.TryParse<OrderStatus>(request.Status, true, out var status))
-            return BadRequest();
-
-        return Ok(await _orderManagementService.GetAllByStatusAsync(status, cancellationToken));
-    }
+        => Ok(await _orderManagementService.GetAllByStatusAsync(request, cancellationToken));
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
