@@ -3,7 +3,10 @@
 public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     private readonly int _developedYear = 2025;
+    private static readonly string _allowedSearchColumn = nameof(Order.CustomerId);
+    private static readonly HashSet<string> _allowedSortColumns = [nameof(Order.Id), nameof(Order.TotalAmount)];
 
     public async Task<IEnumerable<OrderResponse>> GetAllByStatusAsync(OrderStatusRequest request, CancellationToken cancellationToken = default)
     {
@@ -75,14 +78,117 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
         return Result.Success();
     }
     
-    //public async Task<Result> GetHistoryAsync(RequestFilters filters, DateOnly date, CancellationToken cancellationToken = default)
-    //{
-    //    if (date.Year < _developedYear)
-    //        return Result.Success();
-    //}
+    public async Task<Result<IPaginatedList<OrderManagementResponse>>> GetCurrentHistoryAsync(RequestFilters filters, CancellationToken cancellationToken = default)
+    {
+        var (sortColumn, sortDirection) = FiltersCheck(filters);
+
+        var orders = await _unitOfWork.Orders
+            .FindPaginatedListAsync<OrderManagementResponse>
+            (
+                o => o.OrderDate.Date == DateTime.UtcNow.Date,
+                filters.PageNumber,
+                filters.PageSize,
+                filters.SearchValue,
+                _allowedSearchColumn,
+                sortColumn,
+                sortDirection,
+                cancellationToken
+            );
+
+        return Result.Success(orders);
+    }
+
+    public async Task<Result<IPaginatedList<OrderManagementResponse>>> GetHistoryByDateAsync(RequestFilters filters, DateOnly date, CancellationToken cancellationToken = default)
+    {
+        if (date.Year < _developedYear)
+            return Result.Failure<IPaginatedList<OrderManagementResponse>>(OrderErrors.InvalidInput);
+
+        var (sortColumn, sortDirection) = FiltersCheck(filters);
+
+        var orders = await _unitOfWork.Orders
+            .FindPaginatedListAsync<OrderManagementResponse>
+            (
+                o => DateOnly.FromDateTime(o.OrderDate) == date,
+                filters.PageNumber,
+                filters.PageSize,
+                filters.SearchValue,
+                _allowedSearchColumn,
+                sortColumn,
+                sortDirection,
+                cancellationToken
+            );
+
+        return Result.Success(orders);
+    }
+
+    public async Task<Result<IPaginatedList<OrderManagementResponse>>> GetHistoryByMonthAsync(RequestFilters filters, int month, CancellationToken cancellationToken = default)
+    {
+        if (month > 12 || month < 0)
+            return Result.Failure<IPaginatedList<OrderManagementResponse>>(OrderErrors.InvalidInput);
+
+        var (sortColumn, sortDirection) = FiltersCheck(filters);
+
+        var orders = await _unitOfWork.Orders
+            .FindPaginatedListAsync<OrderManagementResponse>
+            (
+                o => o.OrderDate.Month == month && o.OrderDate.Year == DateTime.UtcNow.Year,
+                filters.PageNumber,
+                filters.PageSize,
+                filters.SearchValue,
+                _allowedSearchColumn,
+                sortColumn,
+                sortDirection,
+                cancellationToken
+            );
+
+        return Result.Success(orders);
+    }
+
+    public async Task<Result<IPaginatedList<OrderManagementResponse>>> GetHistoryByYearAsync(RequestFilters filters, int year, CancellationToken cancellationToken = default)
+    {
+        if (year < _developedYear)
+            return Result.Failure<IPaginatedList<OrderManagementResponse>>(OrderErrors.InvalidInput);
+
+        var (sortColumn, sortDirection) = FiltersCheck(filters);
+
+        var orders = await _unitOfWork.Orders
+            .FindPaginatedListAsync<OrderManagementResponse>
+            (
+                o => o.OrderDate.Year == year,
+                filters.PageNumber,
+                filters.PageSize,
+                filters.SearchValue,
+                _allowedSearchColumn,
+                sortColumn,
+                sortDirection,
+                cancellationToken
+            );
+
+        return Result.Success(orders);
+    }
 
     //public async Task<Result> GetEarningAsync()
     //{
 
     //}
+
+    private static (string sortColumn, string sortDirection) FiltersCheck(RequestFilters filters)
+    {
+        string sortColumn, sortDirection;
+
+        if (!string.IsNullOrEmpty(filters.SortColumn))
+            sortColumn = _allowedSortColumns
+                .FirstOrDefault(x => string.Equals(x, filters.SortColumn, StringComparison.OrdinalIgnoreCase))
+                ?? _allowedSortColumns.First();
+        else
+            sortColumn = _allowedSortColumns.First();
+
+        if (!(string.Equals(filters.SortDirection, OrderBy.Ascending, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(filters.SortDirection, OrderBy.Descending, StringComparison.OrdinalIgnoreCase)))
+            sortDirection = OrderBy.Ascending;
+        else
+            sortDirection = filters.SortDirection!;
+
+        return (sortColumn, sortDirection);
+    }
 }

@@ -12,7 +12,7 @@ public sealed class UnitOfWork : IUnitOfWork
     public IBasicRepository<Cart> Carts { get; private set; }
     public ICustomerRepository Customers { get; private set; }
     public IGenericRepository<DeliveryMan, int> DeliveryMen { get; private set; }
-    public IGenericRepository<Order, int> Orders { get; private set; }
+    public IGenericRepositoryWithPagination<Order, int> Orders { get; private set; }
     public IGenericRepository<OrderItem, int> OrderItems { get; private set; }
     public IGenericRepositoryWithPagination<Product, int> Products { get; private set; }
     public IRoleRepository Roles { get; private set; }

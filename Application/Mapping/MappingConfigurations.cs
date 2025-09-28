@@ -10,6 +10,11 @@ public class MappingConfigurations : IRegister
         config.NewConfig<Order, OrderResponse>()
             .Map(dest => dest.OrderDate, src => DateOnly.FromDateTime(src.OrderDate));
 
+        config.NewConfig<Order, OrderManagementResponse>()
+            .Map(dest => dest.OrderDate, src => DateOnly.FromDateTime(src.OrderDate))
+            .Map(dest => dest.ItemCount, src => src.OrderItems.Sum(x => x.Quantity))
+            .Map(dest => dest.TotalAmount, src => src.TotalAmount - src.ShippingCost);
+
         config.NewConfig<Product, OrderProductResponse>()
             .Map(dest => dest.UnitPrice, src => src.CurrentPrice);
 
