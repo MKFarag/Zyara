@@ -167,10 +167,82 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
         return Result.Success(orders);
     }
 
-    //public async Task<Result> GetEarningAsync()
-    //{
+    public async Task<Result<OrderEarningResponse>> GetCurrentEarningAsync(CancellationToken cancellationToken = default)
+    {
+        var orders = await _unitOfWork.Orders
+            .FindAllProjectionAsync
+            (
+                o => o.OrderDate.Date == DateTime.UtcNow.Date,
+                o => new { o.TotalAmount, o.ShippingCost },
+                false,
+                cancellationToken
+            );
 
-    //}
+        var totalEarning = orders.Sum(o => o.TotalAmount);
+        var totalShipping = orders.Sum(o => o.ShippingCost ?? 0);
+
+        return Result.Success(new OrderEarningResponse(totalEarning));
+    }
+
+    public async Task<Result<OrderEarningResponse>> GetEarningByDateAsync(DateOnly date, CancellationToken cancellationToken = default)
+    {
+        if (date.Year < _developedYear)
+            return Result.Failure<OrderEarningResponse>(OrderErrors.InvalidInput);
+
+        var orders = await _unitOfWork.Orders
+            .FindAllProjectionAsync
+            (
+                o => DateOnly.FromDateTime(o.OrderDate) == date,
+                o => new { o.TotalAmount, o.ShippingCost },
+                false,
+                cancellationToken
+            );
+
+        var totalEarning = orders.Sum(o => o.TotalAmount);
+        var totalShipping = orders.Sum(o => o.ShippingCost ?? 0);
+
+        return Result.Success(new OrderEarningResponse(totalEarning));
+    }
+
+    public async Task<Result<OrderEarningResponse>> GetEarningByMonthAsync(int month, CancellationToken cancellationToken = default)
+    {
+        if (month > 12 || month < 0)
+            return Result.Failure<OrderEarningResponse>(OrderErrors.InvalidInput);
+
+        var orders = await _unitOfWork.Orders
+            .FindAllProjectionAsync
+            (
+                o => o.OrderDate.Month == month && o.OrderDate.Year == DateTime.UtcNow.Year,
+                o => new { o.TotalAmount, o.ShippingCost },
+                false,
+                cancellationToken
+            );
+
+        var totalEarning = orders.Sum(o => o.TotalAmount);
+        var totalShipping = orders.Sum(o => o.ShippingCost ?? 0);
+
+        return Result.Success(new OrderEarningResponse(totalEarning));
+    }
+
+    public async Task<Result<OrderEarningResponse>> GetEarningByYearAsync(int year, CancellationToken cancellationToken = default)
+    {
+        if (year < _developedYear)
+            return Result.Failure<OrderEarningResponse>(OrderErrors.InvalidInput);
+
+        var orders = await _unitOfWork.Orders
+            .FindAllProjectionAsync
+            (
+                o => o.OrderDate.Year == year,
+                o => new { o.TotalAmount, o.ShippingCost },
+                false,
+                cancellationToken
+            );
+
+        var totalEarning = orders.Sum(o => o.TotalAmount);
+        var totalShipping = orders.Sum(o => o.ShippingCost ?? 0);
+
+        return Result.Success(new OrderEarningResponse(totalEarning));
+    }
 
     private static (string sortColumn, string sortDirection) FiltersCheck(RequestFilters filters)
     {
