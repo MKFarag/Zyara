@@ -173,13 +173,12 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
             .FindAllProjectionAsync
             (
                 o => o.OrderDate.Date == DateTime.UtcNow.Date,
-                o => new { o.TotalAmount, o.ShippingCost },
+                o => o.TotalAmount,
                 false,
                 cancellationToken
             );
 
-        var totalEarning = orders.Sum(o => o.TotalAmount);
-        var totalShipping = orders.Sum(o => o.ShippingCost ?? 0);
+        var totalEarning = orders.Sum();
 
         return Result.Success(new OrderEarningResponse(totalEarning));
     }
@@ -187,19 +186,18 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
     public async Task<Result<OrderEarningResponse>> GetEarningByDateAsync(DateOnly date, CancellationToken cancellationToken = default)
     {
         if (date.Year < _developedYear)
-            return Result.Failure<OrderEarningResponse>(OrderErrors.InvalidInput);
+            return Result.Success(new OrderEarningResponse(0));
 
         var orders = await _unitOfWork.Orders
             .FindAllProjectionAsync
             (
                 o => DateOnly.FromDateTime(o.OrderDate) == date,
-                o => new { o.TotalAmount, o.ShippingCost },
+                o => o.TotalAmount,
                 false,
                 cancellationToken
             );
 
-        var totalEarning = orders.Sum(o => o.TotalAmount);
-        var totalShipping = orders.Sum(o => o.ShippingCost ?? 0);
+        var totalEarning = orders.Sum();
 
         return Result.Success(new OrderEarningResponse(totalEarning));
     }
@@ -213,13 +211,12 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
             .FindAllProjectionAsync
             (
                 o => o.OrderDate.Month == month && o.OrderDate.Year == DateTime.UtcNow.Year,
-                o => new { o.TotalAmount, o.ShippingCost },
+                o => o.TotalAmount,
                 false,
                 cancellationToken
             );
 
-        var totalEarning = orders.Sum(o => o.TotalAmount);
-        var totalShipping = orders.Sum(o => o.ShippingCost ?? 0);
+        var totalEarning = orders.Sum();
 
         return Result.Success(new OrderEarningResponse(totalEarning));
     }
@@ -227,19 +224,18 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
     public async Task<Result<OrderEarningResponse>> GetEarningByYearAsync(int year, CancellationToken cancellationToken = default)
     {
         if (year < _developedYear)
-            return Result.Failure<OrderEarningResponse>(OrderErrors.InvalidInput);
+            return Result.Success(new OrderEarningResponse(0));
 
         var orders = await _unitOfWork.Orders
             .FindAllProjectionAsync
             (
                 o => o.OrderDate.Year == year,
-                o => new { o.TotalAmount, o.ShippingCost },
+                o => o.TotalAmount,
                 false,
                 cancellationToken
             );
 
-        var totalEarning = orders.Sum(o => o.TotalAmount);
-        var totalShipping = orders.Sum(o => o.ShippingCost ?? 0);
+        var totalEarning = orders.Sum();
 
         return Result.Success(new OrderEarningResponse(totalEarning));
     }

@@ -9,7 +9,7 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
 {
     private readonly IOrderManagementService _orderManagementService = orderManagementService;
 
-    [HttpGet("")]
+    [HttpGet("status")]
     public async Task<IActionResult> GetAll([FromBody] OrderStatusRequest request, CancellationToken cancellationToken)
         => Ok(await _orderManagementService.GetAllByStatusAsync(request, cancellationToken));
 
@@ -17,6 +17,16 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
     public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
     {
         var result = await _orderManagementService.GetAsync(id, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : result.ToProblem();
+    }
+
+    [HttpGet("history")]
+    public async Task<IActionResult> GetCurrentHistory([FromQuery] RequestFilters filters, CancellationToken cancellationToken)
+    {
+        var result = await _orderManagementService.GetCurrentHistoryAsync(filters, cancellationToken);
 
         return result.IsSuccess
             ? Ok(result.Value)
