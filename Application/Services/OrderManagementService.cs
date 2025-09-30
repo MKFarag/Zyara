@@ -8,10 +8,10 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
     private static readonly string _allowedSearchColumn = nameof(Order.CustomerId);
     private static readonly HashSet<string> _allowedSortColumns = [nameof(Order.Id), nameof(Order.TotalAmount)];
 
-    public async Task<IEnumerable<OrderResponse>> GetAllByStatusAsync(OrderStatusRequest request, CancellationToken cancellationToken = default)
+    public async Task<IPaginatedList<OrderResponse>> GetAllByStatusAsync(OrderStatusRequest request, CancellationToken cancellationToken = default)
     {
         if (!Enum.TryParse<OrderStatus>(request.Status, true, out var status))
-            return [];
+            return EmptyPaginatedList.Create<OrderResponse>();
 
         var orders = await _unitOfWork.Orders
             .FindAllAsync
@@ -20,7 +20,7 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
                 cancellationToken
             );
 
-        return orders.Adapt<IEnumerable<OrderResponse>>();
+        return orders.Adapt<IPaginatedList<OrderResponse>>();
     }
 
     public async Task<Result<OrderDetailsResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
@@ -78,7 +78,7 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
         return Result.Success();
     }
     
-    public async Task<Result<IPaginatedList<OrderManagementResponse>>> GetCurrentHistoryAsync(RequestFilters filters, CancellationToken cancellationToken = default)
+    public async Task<IPaginatedList<OrderManagementResponse>> GetCurrentHistoryAsync(RequestFilters filters, CancellationToken cancellationToken = default)
     {
         var (sortColumn, sortDirection) = FiltersCheck(filters);
 
@@ -95,13 +95,13 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
                 cancellationToken
             );
 
-        return Result.Success(orders);
+        return orders;
     }
 
-    public async Task<Result<IPaginatedList<OrderManagementResponse>>> GetHistoryByDateAsync(RequestFilters filters, DateOnly date, CancellationToken cancellationToken = default)
+    public async Task<IPaginatedList<OrderManagementResponse>> GetHistoryByDateAsync(RequestFilters filters, DateOnly date, CancellationToken cancellationToken = default)
     {
         if (date.Year < _developedYear)
-            return Result.Failure<IPaginatedList<OrderManagementResponse>>(OrderErrors.InvalidInput);
+            return EmptyPaginatedList.Create<OrderManagementResponse>();
 
         var (sortColumn, sortDirection) = FiltersCheck(filters);
 
@@ -118,13 +118,13 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
                 cancellationToken
             );
 
-        return Result.Success(orders);
+        return orders;
     }
 
-    public async Task<Result<IPaginatedList<OrderManagementResponse>>> GetHistoryByMonthAsync(RequestFilters filters, int month, CancellationToken cancellationToken = default)
+    public async Task<IPaginatedList<OrderManagementResponse>> GetHistoryByMonthAsync(RequestFilters filters, int month, CancellationToken cancellationToken = default)
     {
         if (month > 12 || month < 0)
-            return Result.Failure<IPaginatedList<OrderManagementResponse>>(OrderErrors.InvalidInput);
+            return EmptyPaginatedList.Create<OrderManagementResponse>();
 
         var (sortColumn, sortDirection) = FiltersCheck(filters);
 
@@ -141,13 +141,13 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
                 cancellationToken
             );
 
-        return Result.Success(orders);
+        return orders;
     }
 
-    public async Task<Result<IPaginatedList<OrderManagementResponse>>> GetHistoryByYearAsync(RequestFilters filters, int year, CancellationToken cancellationToken = default)
+    public async Task<IPaginatedList<OrderManagementResponse>> GetHistoryByYearAsync(RequestFilters filters, int year, CancellationToken cancellationToken = default)
     {
         if (year < _developedYear)
-            return Result.Failure<IPaginatedList<OrderManagementResponse>>(OrderErrors.InvalidInput);
+            return EmptyPaginatedList.Create<OrderManagementResponse>();
 
         var (sortColumn, sortDirection) = FiltersCheck(filters);
 
@@ -164,7 +164,7 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
                 cancellationToken
             );
 
-        return Result.Success(orders);
+        return orders;
     }
 
     public async Task<Result<OrderEarningResponse>> GetCurrentEarningAsync(CancellationToken cancellationToken = default)

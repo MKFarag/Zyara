@@ -10,3 +10,19 @@ public interface IPaginatedList<T> where T : class
     bool HasPreviousPage { get; }
     bool HasNextPage { get; }
 }
+
+/// <summary>Factory for creating empty paginated lists</summary>
+public static class EmptyPaginatedList
+{
+    private class Empty<T> : IPaginatedList<T> where T : class
+    {
+        public List<T> Items { get; } = [];
+        public int PageNumber { get; } = 1;
+        public int TotalPages { get; } = 0;
+        public bool HasPreviousPage => false;
+        public bool HasNextPage => false;
+    }
+
+    public static IPaginatedList<T> Create<T>() where T : class
+        => new Empty<T>();
+}
