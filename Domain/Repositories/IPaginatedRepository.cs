@@ -10,10 +10,11 @@ public interface IPaginatedRepository<TEntity> where TEntity : class
     /// <param name="searchColumn">Column name to search in</param>
     /// <param name="sortColumn">Column name to sort by</param>
     /// <param name="sortDirection">Sort direction ("asc" or "desc")</param>
+    /// <param name="searchColumnType">Defines the data type of the search column (e.g., String, Int, Date, Bool)</param>
     /// <returns>Paginated list of projected entities</returns>
     Task<IPaginatedList<TProjection>> GetPaginatedListAsync<TProjection>(
         int pageNumber, int pageSize, string? searchValue, string? searchColumn, string sortColumn, string sortDirection,
-        CancellationToken cancellationToken = default) where TProjection : class;
+        ColumnType searchColumnType, CancellationToken cancellationToken = default) where TProjection : class;
 
     /// <summary>Get paginated list of entities</summary>
     /// <typeparam name="TProjection">The type to project the entities to (e.g. StudentResponse)</typeparam>
@@ -23,11 +24,12 @@ public interface IPaginatedRepository<TEntity> where TEntity : class
     /// <param name="searchColumn">Column name to search in</param>
     /// <param name="sortColumn">Column name to sort by</param>
     /// <param name="sortDirection">Sort direction ("asc" or "desc")</param>
+    /// <param name="searchColumnType">Defines the data type of the search column (e.g., String, Int, Date, Bool)</param>
     /// <param name="includes">Related data to include</param>
     /// <returns>Paginated list of projected entities</returns>
     Task<IPaginatedList<TProjection>> GetPaginatedListAsync<TProjection>(
         int pageNumber, int pageSize, string? searchValue, string? searchColumn, string sortColumn, string sortDirection,
-        string[] includes, CancellationToken cancellationToken = default) where TProjection : class;
+        ColumnType searchColumnType, string[] includes, CancellationToken cancellationToken = default) where TProjection : class;
 
     /// <summary>Get paginated list of entities with predicate</summary>
     /// <typeparam name="TProjection">The type to project the entities to (e.g. StudentResponse)</typeparam>
@@ -38,11 +40,12 @@ public interface IPaginatedRepository<TEntity> where TEntity : class
     /// <param name="searchColumn">Column name to search in</param>
     /// <param name="sortColumn">Column name to sort by</param>
     /// <param name="sortDirection">Sort direction ("asc" or "desc")</param>
+    /// <param name="searchColumnType">Defines the data type of the search column (e.g., String, Int, Date, Bool)</param>
     /// <returns>Paginated list of projected entities</returns>
     Task<IPaginatedList<TProjection>> FindPaginatedListAsync<TProjection>(
         Expression<Func<TEntity, bool>> predicate,
         int pageNumber, int pageSize, string? searchValue, string? searchColumn, string sortColumn, string sortDirection,
-        CancellationToken cancellationToken = default) where TProjection : class;
+        ColumnType searchColumnType, CancellationToken cancellationToken = default) where TProjection : class;
 
     /// <summary>Get paginated list of entities with predicate</summary>
     /// <typeparam name="TProjection">The type to project the entities to (e.g. StudentResponse)</typeparam>
@@ -53,10 +56,11 @@ public interface IPaginatedRepository<TEntity> where TEntity : class
     /// <param name="searchColumn">Column name to search in</param>
     /// <param name="sortColumn">Column name to sort by</param>
     /// <param name="sortDirection">Sort direction ("asc" or "desc")</param>
+    /// <param name="searchColumnType">Defines the data type of the search column (e.g., String, Int, Date, Bool)</param>
     /// <param name="includes">Related data to include</param>
     /// <returns>Paginated list of projected entities</returns>
     Task<IPaginatedList<TProjection>> FindPaginatedListAsync<TProjection>(
         Expression<Func<TEntity, bool>> predicate,
         int pageNumber, int pageSize, string? searchValue, string? searchColumn, string sortColumn, string sortDirection,
-        string[] includes, CancellationToken cancellationToken = default) where TProjection : class;
+        ColumnType searchColumnType, string[] includes, CancellationToken cancellationToken = default) where TProjection : class;
 }

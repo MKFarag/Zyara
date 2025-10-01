@@ -2,7 +2,7 @@
 
 public interface IOrderManagementService
 {
-    Task<IPaginatedList<OrderResponse>> GetAllByStatusAsync(OrderStatusRequest request, CancellationToken cancellationToken = default);
+    Task<IPaginatedList<OrderResponse>> GetAllByStatusAsync(RequestFilters filters, OrderStatusRequest request, CancellationToken cancellationToken = default);
     Task<Result<OrderDetailsResponse>> GetAsync(int id, CancellationToken cancellationToken = default);
     Task<Result> ChangeStatusAsync(int id, OrderStatusRequest request, CancellationToken cancellationToken = default);
     Task<Result> SetDeliveryManAsync(int orderId, int deliveryManId, CancellationToken cancellationToken = default);

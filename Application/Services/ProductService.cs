@@ -11,7 +11,7 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
 
     public async Task<IPaginatedList<ProductResponse>> GetAllAsync(RequestFilters filters, bool includeNotAvailable, CancellationToken cancellationToken = default)
     {
-        var (sortColumn, sortDirection) = FiltersCheck(filters);
+        var checkedFilters = filters.Check(_allowedSortColumns);
 
         IPaginatedList<ProductResponse> response;
 
@@ -19,12 +19,13 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
             response = await _unitOfWork.Products
                 .GetPaginatedListAsync<ProductResponse>
                 (
-                    filters.PageNumber,
-                    filters.PageSize,
-                    filters.SearchValue,
+                    checkedFilters.PageNumber,
+                    checkedFilters.PageSize,
+                    checkedFilters.SearchValue,
                     _allowedSearchColumn,
-                    sortColumn,
-                    sortDirection,
+                    checkedFilters.SortColumn!,
+                    checkedFilters.SortDirection!,
+                    ColumnType.String,
                     cancellationToken
                 );
         else
@@ -32,12 +33,13 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
                 .FindPaginatedListAsync<ProductResponse>
                 (
                     p => p.StorageQuantity > 0,
-                    filters.PageNumber,
-                    filters.PageSize,
-                    filters.SearchValue,
+                    checkedFilters.PageNumber,
+                    checkedFilters.PageSize,
+                    checkedFilters.SearchValue,
                     _allowedSearchColumn,
-                    sortColumn,
-                    sortDirection,
+                    checkedFilters.SortColumn!,
+                    checkedFilters.SortDirection!,
+                    ColumnType.String,
                     cancellationToken
                 );
 
@@ -139,25 +141,5 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
         await _unitOfWork.CompleteAsync(cancellationToken);
 
         return Result.Success();
-    }
-
-    private static (string sortColumn, string sortDirection) FiltersCheck(RequestFilters filters)
-    {
-        string sortColumn, sortDirection;
-
-        if (!string.IsNullOrEmpty(filters.SortColumn))
-            sortColumn = _allowedSortColumns
-                .FirstOrDefault(x => string.Equals(x, filters.SortColumn, StringComparison.OrdinalIgnoreCase))
-                ?? _allowedSortColumns.First();
-        else
-            sortColumn = _allowedSortColumns.First();
-
-        if (!(string.Equals(filters.SortDirection, OrderBy.Ascending, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(filters.SortDirection, OrderBy.Descending, StringComparison.OrdinalIgnoreCase)))
-            sortDirection = OrderBy.Ascending;
-        else
-            sortDirection = filters.SortDirection!;
-
-        return (sortColumn, sortDirection);
     }
 }

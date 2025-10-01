@@ -4,14 +4,14 @@ namespace Presentation.Controllers;
 
 [Route("api/admin/orders")]
 [ApiController]
-//[Authorize]
+[Authorize]
 public class AdminOrdersController(IOrderManagementService orderManagementService) : ControllerBase
 {
     private readonly IOrderManagementService _orderManagementService = orderManagementService;
 
     [HttpGet("")]
-    public async Task<IActionResult> GetAll([FromBody] OrderStatusRequest request, CancellationToken cancellationToken)
-        => Ok(await _orderManagementService.GetAllByStatusAsync(request, cancellationToken));
+    public async Task<IActionResult> GetAll([FromQuery] RequestFilters filters, [FromBody] OrderStatusRequest request, CancellationToken cancellationToken)
+        => Ok(await _orderManagementService.GetAllByStatusAsync(filters, request, cancellationToken));
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)

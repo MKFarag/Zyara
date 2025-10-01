@@ -8,19 +8,29 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
     private static readonly string _allowedSearchColumn = nameof(Order.CustomerId);
     private static readonly HashSet<string> _allowedSortColumns = [nameof(Order.Id), nameof(Order.TotalAmount)];
 
-    public async Task<IPaginatedList<OrderResponse>> GetAllByStatusAsync(OrderStatusRequest request, CancellationToken cancellationToken = default)
+    public async Task<IPaginatedList<OrderResponse>> GetAllByStatusAsync(RequestFilters filters, OrderStatusRequest request, CancellationToken cancellationToken = default)
     {
         if (!Enum.TryParse<OrderStatus>(request.Status, true, out var status))
             return EmptyPaginatedList.Create<OrderResponse>();
 
+        var checkedFilters = filters.Check(_allowedSortColumns);
+
         var orders = await _unitOfWork.Orders
-            .FindAllAsync
-            (   o => o.Status == status,
+            .FindPaginatedListAsync<OrderResponse>
+            (   
+                o => o.Status == status,
+                checkedFilters.PageNumber,
+                checkedFilters.PageSize,
+                checkedFilters.SearchValue,
+                _allowedSearchColumn,
+                checkedFilters.SortColumn!,
+                checkedFilters.SortDirection!,
+                ColumnType.String,
                 [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
                 cancellationToken
             );
 
-        return orders.Adapt<IPaginatedList<OrderResponse>>();
+        return orders;
     }
 
     public async Task<Result<OrderDetailsResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
@@ -80,18 +90,19 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
     
     public async Task<IPaginatedList<OrderManagementResponse>> GetCurrentHistoryAsync(RequestFilters filters, CancellationToken cancellationToken = default)
     {
-        var (sortColumn, sortDirection) = FiltersCheck(filters);
+        var checkedFilters = filters.Check(_allowedSortColumns);
 
         var orders = await _unitOfWork.Orders
             .FindPaginatedListAsync<OrderManagementResponse>
             (
                 o => o.OrderDate.Date == DateTime.UtcNow.Date,
-                filters.PageNumber,
-                filters.PageSize,
-                filters.SearchValue,
+                checkedFilters.PageNumber,
+                checkedFilters.PageSize,
+                checkedFilters.SearchValue,
                 _allowedSearchColumn,
-                sortColumn,
-                sortDirection,
+                checkedFilters.SortColumn!,
+                checkedFilters.SortDirection!,
+                ColumnType.String,
                 cancellationToken
             );
 
@@ -103,18 +114,19 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
         if (date.Year < _developedYear)
             return EmptyPaginatedList.Create<OrderManagementResponse>();
 
-        var (sortColumn, sortDirection) = FiltersCheck(filters);
+        var checkedFilters = filters.Check(_allowedSortColumns);
 
         var orders = await _unitOfWork.Orders
             .FindPaginatedListAsync<OrderManagementResponse>
             (
                 o => DateOnly.FromDateTime(o.OrderDate) == date,
-                filters.PageNumber,
-                filters.PageSize,
-                filters.SearchValue,
+                checkedFilters.PageNumber,
+                checkedFilters.PageSize,
+                checkedFilters.SearchValue,
                 _allowedSearchColumn,
-                sortColumn,
-                sortDirection,
+                checkedFilters.SortColumn!,
+                checkedFilters.SortDirection!,
+                ColumnType.String,
                 cancellationToken
             );
 
@@ -126,18 +138,19 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
         if (month > 12 || month < 0)
             return EmptyPaginatedList.Create<OrderManagementResponse>();
 
-        var (sortColumn, sortDirection) = FiltersCheck(filters);
+        var checkedFilters = filters.Check(_allowedSortColumns);
 
         var orders = await _unitOfWork.Orders
             .FindPaginatedListAsync<OrderManagementResponse>
             (
                 o => o.OrderDate.Month == month && o.OrderDate.Year == DateTime.UtcNow.Year,
-                filters.PageNumber,
-                filters.PageSize,
-                filters.SearchValue,
+                checkedFilters.PageNumber,
+                checkedFilters.PageSize,
+                checkedFilters.SearchValue,
                 _allowedSearchColumn,
-                sortColumn,
-                sortDirection,
+                checkedFilters.SortColumn!,
+                checkedFilters.SortDirection!,
+                ColumnType.String,
                 cancellationToken
             );
 
@@ -149,18 +162,19 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
         if (year < _developedYear)
             return EmptyPaginatedList.Create<OrderManagementResponse>();
 
-        var (sortColumn, sortDirection) = FiltersCheck(filters);
+        var checkedFilters = filters.Check(_allowedSortColumns);
 
         var orders = await _unitOfWork.Orders
             .FindPaginatedListAsync<OrderManagementResponse>
             (
                 o => o.OrderDate.Year == year,
-                filters.PageNumber,
-                filters.PageSize,
-                filters.SearchValue,
+                checkedFilters.PageNumber,
+                checkedFilters.PageSize,
+                checkedFilters.SearchValue,
                 _allowedSearchColumn,
-                sortColumn,
-                sortDirection,
+                checkedFilters.SortColumn!,
+                checkedFilters.SortDirection!,
+                ColumnType.String,
                 cancellationToken
             );
 
@@ -238,25 +252,5 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
         var totalEarning = orders.Sum();
 
         return Result.Success(new OrderEarningResponse(totalEarning));
-    }
-
-    private static (string sortColumn, string sortDirection) FiltersCheck(RequestFilters filters)
-    {
-        string sortColumn, sortDirection;
-
-        if (!string.IsNullOrEmpty(filters.SortColumn))
-            sortColumn = _allowedSortColumns
-                .FirstOrDefault(x => string.Equals(x, filters.SortColumn, StringComparison.OrdinalIgnoreCase))
-                ?? _allowedSortColumns.First();
-        else
-            sortColumn = _allowedSortColumns.First();
-
-        if (!(string.Equals(filters.SortDirection, OrderBy.Ascending, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(filters.SortDirection, OrderBy.Descending, StringComparison.OrdinalIgnoreCase)))
-            sortDirection = OrderBy.Ascending;
-        else
-            sortDirection = filters.SortDirection!;
-
-        return (sortColumn, sortDirection);
     }
 }
