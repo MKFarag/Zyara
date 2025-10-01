@@ -32,21 +32,6 @@ public class EmailTemplateService
     }
 
     /// <summary>
-    /// Sends an email with a confirmation code to the user
-    /// </summary>
-    /// <param name="user">The user to send the confirmation code to</param>
-    /// <param name="code">The confirmation code</param>
-    /// <param name="expiryTimeInMinutes">The expiry time in minutes for the confirmation code</param>
-    public void SendConfirmationCode(User user, string code, int expiryTimeInMinutes)
-    {
-        var data = GetBaseEmailTemplateData(user.FirstName);
-        data.Add(EmailTemplateOptions.Placeholders.Code, code);
-        data.Add(EmailTemplateOptions.Placeholders.ExpiryTime, expiryTimeInMinutes.ToString());
-
-        EnqueueEmail(user.Email!, "Zyara email confirmation", EmailTemplateOptions.TemplatesNames.EmailConfirmationCode, data);
-    }
-
-    /// <summary>
     /// Sends an email with a password reset link to the user
     /// </summary>
     /// <param name="user">The user to send the reset password link to</param>

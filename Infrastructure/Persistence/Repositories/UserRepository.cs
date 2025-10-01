@@ -95,7 +95,7 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
     public async Task<bool> IsLockedOutAsync(User user)
     {
         var applicationUser = await GetByIdOrThrowAsync(user.Id);
-
+        
         return await _userManager.IsLockedOutAsync(applicationUser);
     }
 

@@ -17,3 +17,4 @@ global using Application.Contracts.Cart;
 global using Application.Contracts.Customer;
 global using Application.Contracts.DeliveryMan;
 global using Application.Extensions;
+global using Application.Contracts.User;
