@@ -7,4 +7,5 @@ public interface IUserService
     Task<Result> ChangePasswordAsync(string id, ChangePasswordRequest request, CancellationToken cancellationToken = default);
     Task<Result> ChangeEmailRequestAsync(string id, string newEmail, CancellationToken cancellationToken = default);
     Task<Result> ConfirmChangeEmailAsync(string id, ConfirmChangeEmailRequest request, CancellationToken cancellationToken = default);
+    Task<Result> ChangeUserNameAsync(string id, string newUserName, CancellationToken cancellationToken = default);
 }

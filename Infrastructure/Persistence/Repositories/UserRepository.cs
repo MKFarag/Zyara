@@ -59,8 +59,7 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
                   .Select(u => new
                   {
                       u.Key.Id,
-                      u.Key.FirstName,
-                      u.Key.LastName,
+                      FullName = $"{u.Key.FirstName}, {u.Key.LastName}",
                       u.Key.Email,
                       u.Key.UserName,
                       u.Key.IsDisabled,
@@ -104,6 +103,13 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
         var applicationUser = await GetByIdOrThrowAsync(user.Id);
 
         return await _userManager.IsEmailConfirmedAsync(applicationUser);
+    }
+
+    public async Task<bool> IsChangeUserNameAvailable(User user)
+    {
+        var applicationUser = await GetByIdOrThrowAsync(user.Id);
+
+        return applicationUser.UserNameChangeAvailableAt == null || applicationUser.UserNameChangeAvailableAt <= DateTime.UtcNow;
     }
 
     public async Task<bool> ExistsAsync(string userId, CancellationToken cancellationToken = default)
@@ -243,6 +249,21 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
         var applicationUser = await GetByIdOrThrowAsync(user.Id);
 
         var result = await _userManager.ChangePasswordAsync(applicationUser, currentPassword, newPassword);
+
+        return result.ToDomain();
+    }
+
+    public async Task<Result> ChangeUserNameAsync(User user, string newUserName, int minDaysBetweenChanges)
+    {
+        var applicationUser = await GetByIdOrThrowAsync(user.Id);
+
+        var result = await _userManager.SetUserNameAsync(applicationUser, newUserName);
+
+        if (result.Succeeded)
+        {
+            applicationUser.UserNameChangeAvailableAt = DateTime.UtcNow.AddDays(minDaysBetweenChanges);
+            result = await _userManager.UpdateAsync(applicationUser);
+        }
 
         return result.ToDomain();
     }

@@ -7,6 +7,7 @@ public class UserService(IUnitOfWork unitOfWork, IEmailTemplateService emailTemp
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IEmailTemplateService _emailTemplateService = emailTemplateService;
+    private readonly int _minDaysBetweenChanges = 30;
 
     public async Task<Result<UserProfileResponse>> GetProfileAsync(string id, CancellationToken cancellationToken = default)
     {
@@ -82,5 +83,24 @@ public class UserService(IUnitOfWork unitOfWork, IEmailTemplateService emailTemp
         _emailTemplateService.SendChangeEmailNotification(user, oldEmail, DateTime.UtcNow);
 
         return Result.Success();
+    }
+
+    public async Task<Result> ChangeUserNameAsync(string id, string newUserName, CancellationToken cancellationToken = default)
+    {
+        if (await _unitOfWork.Users.UserNameExistsAsync(newUserName, id, cancellationToken))
+            return Result.Failure(UserErrors.DuplicatedUserName);
+
+        if (await _unitOfWork.Users.FindByIdAsync(id, cancellationToken) is not { } user)
+            return Result.Failure(UserErrors.NotFound);
+
+        if (string.Equals(user.UserName, newUserName, StringComparison.OrdinalIgnoreCase))
+            return Result.Failure(UserErrors.SameUserName);
+
+        if (await _unitOfWork.Users.IsChangeUserNameAvailable(user))
+            return Result.Failure(UserErrors.UserNameChangeNotAllowed);
+
+        var changeUserNameResult = await _unitOfWork.Users.ChangeUserNameAsync(user, newUserName, _minDaysBetweenChanges);
+
+        return changeUserNameResult;
     }
 }

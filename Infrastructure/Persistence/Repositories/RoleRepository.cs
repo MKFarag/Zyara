@@ -13,11 +13,14 @@ public class RoleRepository(ApplicationDbContext context, RoleManager<Applicatio
     public async Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(bool includeDefault = false, bool includeDisabled = false, CancellationToken cancellationToken = default)
         where TProjection : class
         => await _context.Roles
+            .AsNoTracking()
             .Where(r => (includeDefault || !r.IsDefault) && (includeDisabled || !r.IsDisabled))
             .ProjectToType<TProjection>()
             .ToListAsync(cancellationToken);
+
     public async Task<IEnumerable<string>> GetAllNamesAsync(bool includeDefault = false, bool includeDisabled = false, CancellationToken cancellationToken = default)
         => await _context.Roles
+            .AsNoTracking()
             .Where(r => (includeDefault || !r.IsDefault) && (includeDisabled || !r.IsDisabled))
             .Select(r => r.Name!)
             .Distinct()

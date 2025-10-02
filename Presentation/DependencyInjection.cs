@@ -39,6 +39,8 @@ public static class DependencyInjection
         services.AddScoped<IOrderManagementService, OrderManagementService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserManagementService, UserManagementService>();
 
         services
             .AddEndpointsApiExplorer()

@@ -24,5 +24,9 @@ public class MappingConfigurations : IRegister
             .Map(dest => dest.Customer, src => src.user)
             .Map(dest => dest.Customer.Name, src => src.user.FullName)
             .Map(dest => dest.Customer.PhoneNumber, src => src.phoneNumber);
+
+        config.NewConfig<(User user, Role role), UserResponse>()
+            .Map(dest => dest.Roles, src => src.role)
+            .Map(dest => dest, src => src.user);
     }
 }

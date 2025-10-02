@@ -37,6 +37,9 @@ public interface IUserRepository
     /// <summary>Checks if a user's email address has been confirmed.</summary>
     Task<bool> IsEmailConfirmedAsync(User user);
 
+    /// <summary>Checks if a user can change their username.</summary>
+    Task<bool> IsChangeUserNameAvailable(User user);
+
     /// <summary>Checks if a user exists in the system.</summary>
     Task<bool> ExistsAsync(string userId, CancellationToken cancellationToken = default);
 
@@ -89,6 +92,9 @@ public interface IUserRepository
 
     /// <summary>Changes a user's password with current password verification.</summary>
     Task<Result> ChangePasswordAsync(User user, string currentPassword, string newPassword);
+
+    /// <summary>Changes a user's username with validation on minimum days between changes.</summary>
+    Task<Result> ChangeUserNameAsync(User user, string newUserName, int minDaysBetweenChanges);
 
     /// <summary>Adds multiple roles to a user.</summary>
     Task<Result> AddToRolesAsync(User user, IEnumerable<string> roles);
