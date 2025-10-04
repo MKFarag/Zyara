@@ -26,7 +26,7 @@ public class AuthService(IEmailTemplateService emailTemplateService, ISignInServ
         var user = result.Value;
 
         if (user.IsDisabled)
-            return Result.Failure<AuthResponse>(UserErrors.DisabledUser);
+            return Result.Failure<AuthResponse>(UserErrors.Disabled);
 
         var (userRoles, userPermissions) = await _unitOfWork.Users.GetRolesAndPermissionsAsync(user, cancellationToken);
 
@@ -55,7 +55,7 @@ public class AuthService(IEmailTemplateService emailTemplateService, ISignInServ
             return Result.Failure<AuthResponse>(UserErrors.InvalidJwtToken);
 
         if (user.IsDisabled)
-            return Result.Failure<AuthResponse>(UserErrors.DisabledUser);
+            return Result.Failure<AuthResponse>(UserErrors.Disabled);
 
         if (await _unitOfWork.Users.IsLockedOutAsync(user))
             return Result.Failure<AuthResponse>(UserErrors.Locked);
