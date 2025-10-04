@@ -49,7 +49,7 @@ public class ProductsController(IProductService productService) : ControllerBase
             : result.ToProblem();
     }
 
-    [HttpPatch("{id}/current-price")]
+    [HttpPut("{id}/current-price")]
     public async Task<IActionResult> UpdateCurrentPrice([FromRoute] int id, [FromBody] UpdateProductPriceRequest request, CancellationToken cancellationToken)
     {
         if (id <= 0)
@@ -62,7 +62,7 @@ public class ProductsController(IProductService productService) : ControllerBase
             : result.ToProblem();
     }
 
-    [HttpPatch("{id}/selling-price")]
+    [HttpPut("{id}/selling-price")]
     public async Task<IActionResult> UpdateSellingPrice([FromRoute] int id, [FromBody] UpdateProductPriceRequest request, CancellationToken cancellationToken)
     {
         if (id <= 0)
@@ -75,7 +75,7 @@ public class ProductsController(IProductService productService) : ControllerBase
             : result.ToProblem();
     }
 
-    [HttpPatch("{id}/increase")]
+    [HttpPut("{id}/increase")]
     public async Task<IActionResult> IncreaseQuantity([FromRoute] int id, [FromBody] UpdateProductQuantityRequest request, CancellationToken cancellationToken)
     {
         if (id <= 0)
@@ -88,7 +88,7 @@ public class ProductsController(IProductService productService) : ControllerBase
             : result.ToProblem();
     }
 
-    [HttpPatch("{id}/decrease")]
+    [HttpPut("{id}/decrease")]
     public async Task<IActionResult> DecreaseQuantity([FromRoute] int id, [FromBody] UpdateProductQuantityRequest request, CancellationToken cancellationToken)
     {
         if (id <= 0)

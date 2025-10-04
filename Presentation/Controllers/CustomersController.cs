@@ -32,7 +32,7 @@ public class CustomersController(ICustomerService customerService) : ControllerB
 			: result.ToProblem();
 	}
 
-    [HttpPatch("default-address/{addressId}")]
+    [HttpPut("default-address/{addressId}")]
 	public async Task<IActionResult> SetDefaultAddress([FromRoute] int addressId, CancellationToken cancellationToken)
 	{
 		var result = await _customerService.SetDefaultAddressAsync(User.GetId()!, addressId, cancellationToken);
@@ -96,7 +96,7 @@ public class CustomersController(ICustomerService customerService) : ControllerB
 			: result.ToProblem();
 	}
 
-	[HttpPatch("primary-phone")]
+	[HttpPut("primary-phone")]
 	public async Task<IActionResult> SetPrimaryPhoneNumber([FromBody] PhoneNumberRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _customerService.SetPrimaryPhoneNumberAsync(User.GetId()!, request.PhoneNumber, cancellationToken);

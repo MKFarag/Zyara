@@ -46,7 +46,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
             : result.ToProblem();
     }
 
-    [HttpPatch("{id}")]
+    [HttpPut("{id}/cancel")]
     public async Task<IActionResult> CancelOrder([FromRoute] int id, CancellationToken cancellationToken)
     {
         var result = await _orderService.CancelAsync(User.GetId()!, id, cancellationToken);

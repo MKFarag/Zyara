@@ -29,7 +29,7 @@ public class CartsController(ICartService cartService) : ControllerBase
             : result.ToProblem();
     }
 
-    [HttpPatch("{productId}")]
+    [HttpPut("{productId}")]
     public async Task<IActionResult> Delete([FromRoute] int productId, [FromBody] CartQuantityRequest request, CancellationToken cancellationToken)
     {
         var result = await _cartService.DeleteAsync(User.GetId()!, productId, request.Quantity, cancellationToken);
