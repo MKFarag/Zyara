@@ -14,10 +14,10 @@ public record UserErrors
     public static readonly Error DisabledUser =
         new("User.Disabled", "Disabled user, please contact your administrator", StatusCodes.Unauthorized);
 
-    public static readonly Error LockedUser =
+    public static readonly Error Locked =
         new("User.Locked", "Locked user, please contact your administrator", StatusCodes.Unauthorized);
 
-    public static readonly Error NotLockedUser =
+    public static readonly Error NotLocked =
         new("User.NotLocked", "This user is not locked", StatusCodes.BadRequest);
 
     public static readonly Error InvalidRefreshToken =

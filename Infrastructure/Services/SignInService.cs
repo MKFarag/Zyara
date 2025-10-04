@@ -42,7 +42,7 @@ public class SignInService(SignInManager<ApplicationUser> signInManager, UserMan
 
     private static Error MapSignInError(SignInResult result)
         => result.IsNotAllowed ? UserErrors.EmailNotConfirmed
-             : result.IsLockedOut ? UserErrors.LockedUser
+             : result.IsLockedOut ? UserErrors.Locked
              : UserErrors.InvalidCredentials;
 }
 

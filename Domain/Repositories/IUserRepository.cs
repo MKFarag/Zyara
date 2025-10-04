@@ -103,13 +103,16 @@ public interface IUserRepository
     Task<Result> AddToRoleAsync(User user, string role);
 
     /// <summary>Removes all roles from a user in bulk operation.</summary>
-    Task BulkDeleteAllRolesAsync(User user, CancellationToken cancellationToken = default);
+    Task DeleteAllRolesAsync(User user);
 
     /// <summary>Adds a refresh token to a user's token collection.</summary>
     Task AddRefreshTokenAsync(User user, RefreshToken refreshToken, CancellationToken cancellationToken = default);
 
     /// <summary>Revokes a user's refresh token by marking it as inactive.</summary>
     Task<Result> RevokeRefreshTokenAsync(User user, string token, CancellationToken cancellationToken = default);
+
+    /// <summary>Toggle status for a specific user.</summary>
+    Task ToggleStatusAsync(User user, CancellationToken cancellationToken = default);
 
     #endregion
 

@@ -58,7 +58,7 @@ public class AuthService(IEmailTemplateService emailTemplateService, ISignInServ
             return Result.Failure<AuthResponse>(UserErrors.DisabledUser);
 
         if (await _unitOfWork.Users.IsLockedOutAsync(user))
-            return Result.Failure<AuthResponse>(UserErrors.LockedUser);
+            return Result.Failure<AuthResponse>(UserErrors.Locked);
 
         var revokeResult = await _unitOfWork.Users.RevokeRefreshTokenAsync(user, refreshToken, cancellationToken);
 

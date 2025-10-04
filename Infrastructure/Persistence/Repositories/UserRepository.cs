@@ -1,4 +1,7 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore.Query;
+
+namespace Infrastructure.Persistence.Repositories;
 
 public class UserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : IUserRepository
 {
@@ -286,10 +289,10 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
         return result.ToDomain();
     }
 
-    public async Task BulkDeleteAllRolesAsync(User user, CancellationToken cancellationToken = default)
+    public async Task DeleteAllRolesAsync(User user)
         => await _context.UserRoles
             .Where(ur => ur.UserId == user.Id)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ExecuteDeleteAsync();
 
     public async Task AddRefreshTokenAsync(User user, RefreshToken refreshToken, CancellationToken cancellationToken = default)
     {
@@ -315,6 +318,15 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
 
         return Result.Success();
     }
+
+    public async Task ToggleStatusAsync(User user, CancellationToken cancellationToken = default)
+        => await _context.Users
+            .Where(u => u.Id == user.Id)
+            .ExecuteUpdateAsync
+            (
+                u => u.SetProperty(x => x.IsDisabled, x => !x.IsDisabled)
+                , cancellationToken
+            );
 
     #endregion
 
