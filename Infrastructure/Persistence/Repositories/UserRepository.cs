@@ -1,7 +1,4 @@
-﻿using Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore.Query;
-
-namespace Infrastructure.Persistence.Repositories;
+﻿namespace Infrastructure.Persistence.Repositories;
 
 public class UserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : IUserRepository
 {
@@ -22,21 +19,6 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
             .AsNoTracking()
             .Where(u => u.NormalizedEmail == _userManager.NormalizeEmail(email))
             .ProjectToType<User>()
-            .SingleOrDefaultAsync(cancellationToken);
-
-    public async Task<User?> FindByUserNameAsync(string userName, CancellationToken cancellationToken = default)
-        => await _context.Users
-            .AsNoTracking()
-            .Where(u => u.NormalizedUserName == _userManager.NormalizeName(userName))
-            .ProjectToType<User>()
-            .SingleOrDefaultAsync(cancellationToken);
-
-    public async Task<TProjection?> GetProjectionAsync<TProjection>(string id, CancellationToken cancellationToken = default)
-        where TProjection : class
-        => await _context.Users
-            .AsNoTracking()
-            .Where(u => u.Id == id)
-            .ProjectToType<TProjection>()
             .SingleOrDefaultAsync(cancellationToken);
 
     public async Task<IEnumerable<TProjection>> GetAllProjectionWithRolesAsync<TProjection>(bool includeDefaultRole, CancellationToken cancellationToken = default)
@@ -327,16 +309,6 @@ public class UserRepository(ApplicationDbContext context, UserManager<Applicatio
                 u => u.SetProperty(x => x.IsDisabled, x => !x.IsDisabled)
                 , cancellationToken
             );
-
-    #endregion
-
-    #region Helper
-
-    public string NormalizeEmail(string email)
-        => _userManager.NormalizeEmail(email);
-
-    public string NormalizeUserName(string userName)
-        => _userManager.NormalizeName(userName);
 
     #endregion
 

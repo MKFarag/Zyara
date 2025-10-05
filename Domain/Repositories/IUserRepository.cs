@@ -10,13 +10,6 @@ public interface IUserRepository
     /// <summary>Finds a user by their email address.</summary>
     Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken = default);
 
-    /// <summary>Finds a user by their username.</summary>
-    Task<User?> FindByUserNameAsync(string userName, CancellationToken cancellationToken = default);
-
-    /// <summary>Get a user by their unique identifier with a custom projection.</summary>
-    Task<TProjection?> GetProjectionAsync<TProjection>(string id, CancellationToken cancellationToken = default)
-        where TProjection : class;
-
     /// <summary>Gets all users with their roles projected to a specific type.</summary>
     Task<IEnumerable<TProjection>> GetAllProjectionWithRolesAsync<TProjection>(bool includeDefaultRole, CancellationToken cancellationToken = default)
         where TProjection : class;
@@ -113,16 +106,6 @@ public interface IUserRepository
 
     /// <summary>Toggle status for a specific user.</summary>
     Task ToggleStatusAsync(User user, CancellationToken cancellationToken = default);
-
-    #endregion
-
-    #region Helper
-
-    /// <summary>Normalizes the specified email for consistent storage and comparison.</summary>
-    string NormalizeEmail(string email);
-
-    /// <summary>Normalizes the specified username for consistent storage and comparison.</summary>
-    string NormalizeUserName(string userName);
 
     #endregion
 }
