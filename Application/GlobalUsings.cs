@@ -18,3 +18,4 @@ global using Application.Contracts.Customer;
 global using Application.Contracts.DeliveryMan;
 global using Application.Extensions;
 global using Application.Contracts.User;
+global using Application.Contracts.Role;

@@ -5,11 +5,10 @@ public interface IRoleRepository
     #region Read Operations
 
     /// <summary>Get a role by their unique identifier.</summary>
-    Task<Role?> FindByIdAsync(string id);
+    Task<Role?> GetAsync(string id, CancellationToken cancellationToken = default);
 
     /// <summary>Get all roles with optional filtering for default and disabled roles.</summary>
-    Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(bool includeDefault = false, bool includeDisabled = false, CancellationToken cancellationToken = default)
-        where TProjection : class;
+    Task<IEnumerable<Role>> GetAllAsync(bool includeDefault = false, bool includeDisabled = false, CancellationToken cancellationToken = default);
 
     /// <summary>Get all role names with optional filtering for default and disabled roles.</summary>
     Task<IEnumerable<string>> GetAllNamesAsync(bool includeDefault = false, bool includeDisabled = false, CancellationToken cancellationToken = default);
@@ -47,10 +46,13 @@ public interface IRoleRepository
     Task AddClaimsAsync(string roleId, string claimType, IEnumerable<string> claimValue, CancellationToken cancellationToken = default);
 
     /// <summary>Delete all claims for a specific role.</summary>
-    Task BulkDeleteClaimsAsync(string roleId, CancellationToken cancellationToken = default);
+    Task DeleteClaimsAsync(string roleId, CancellationToken cancellationToken = default);
 
     /// <summary>Delete specific claims for a role based on claim values.</summary>
-    Task BulkDeleteClaimsAsync(string roleId, IEnumerable<string> claimValue, CancellationToken cancellationToken = default);
+    Task DeleteClaimsAsync(string roleId, IEnumerable<string> claimValue, CancellationToken cancellationToken = default);
+
+    /// <summary>Toggle status for a specific role.</summary>
+    Task ToggleStatusAsync(Role role, CancellationToken cancellationToken = default);
 
     #endregion
 }

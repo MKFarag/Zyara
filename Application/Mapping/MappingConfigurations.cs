@@ -28,5 +28,9 @@ public class MappingConfigurations : IRegister
         config.NewConfig<(User user, Role role), UserResponse>()
             .Map(dest => dest.Roles, src => src.role)
             .Map(dest => dest, src => src.user);
+
+        config.NewConfig<(Role role, IEnumerable<string> permissions), RoleDetailResponse>()
+            .Map(dest => dest, src => src.role)
+            .Map(dest => dest.Permissions, src => src.permissions);
     }
 }

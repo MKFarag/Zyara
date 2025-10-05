@@ -7,15 +7,14 @@ public class RoleRepository(ApplicationDbContext context, RoleManager<Applicatio
 
     #region Read Operations
 
-    public async Task<Role?> FindByIdAsync(string id)
-        => (await _roleManager.FindByIdAsync(id))?.Adapt<Role>();
+    public async Task<Role?> GetAsync(string id, CancellationToken cancellationToken = default)
+        => await _context.Roles.ProjectToType<Role>().FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
 
-    public async Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(bool includeDefault = false, bool includeDisabled = false, CancellationToken cancellationToken = default)
-        where TProjection : class
+    public async Task<IEnumerable<Role>> GetAllAsync(bool includeDefault = false, bool includeDisabled = false, CancellationToken cancellationToken = default)
         => await _context.Roles
             .AsNoTracking()
             .Where(r => (includeDefault || !r.IsDefault) && (includeDisabled || !r.IsDisabled))
-            .ProjectToType<TProjection>()
+            .ProjectToType<Role>()
             .ToListAsync(cancellationToken);
 
     public async Task<IEnumerable<string>> GetAllNamesAsync(bool includeDefault = false, bool includeDisabled = false, CancellationToken cancellationToken = default)
@@ -28,12 +27,14 @@ public class RoleRepository(ApplicationDbContext context, RoleManager<Applicatio
 
     public async Task<IEnumerable<string>> GetClaimsAsync(string roleId, CancellationToken cancellationToken = default)
         => await _context.RoleClaims
+            .AsNoTracking()
             .Where(rc => rc.RoleId == roleId)
             .Select(rc => rc.ClaimValue!)
             .ToListAsync(cancellationToken);
 
     public async Task<IEnumerable<string>> GetClaimsAsync(string roleId, string claimType, CancellationToken cancellationToken = default)
         => await _context.RoleClaims
+            .AsNoTracking()
             .Where(rc => rc.RoleId == roleId && rc.ClaimType == claimType)
             .Select(rc => rc.ClaimValue!)
             .ToListAsync(cancellationToken);
@@ -46,16 +47,19 @@ public class RoleRepository(ApplicationDbContext context, RoleManager<Applicatio
     {
         roleName = _roleManager.NormalizeKey(roleName);
 
-        return await _context.Roles.AnyAsync(r => r.NormalizedName == roleName, cancellationToken);
+        return await _context.Roles
+            .AsNoTracking()
+            .AnyAsync(r => r.NormalizedName == roleName, cancellationToken);
     }
 
     public async Task<bool> NameExistsAsync(string roleName, string roleId, CancellationToken cancellationToken = default)
     {
         roleName = _roleManager.NormalizeKey(roleName);
 
-        return await _context.Roles.AnyAsync(r => r.NormalizedName == roleName && r.Id != roleId, cancellationToken);
+        return await _context.Roles
+            .AsNoTracking()
+            .AnyAsync(r => r.NormalizedName == roleName && r.Id != roleId, cancellationToken);
     }
-
 
     #endregion
 
@@ -112,15 +116,24 @@ public class RoleRepository(ApplicationDbContext context, RoleManager<Applicatio
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task BulkDeleteClaimsAsync(string roleId, CancellationToken cancellationToken = default)
+    public async Task DeleteClaimsAsync(string roleId, CancellationToken cancellationToken = default)
         => await _context.RoleClaims
             .Where(rc => rc.RoleId == roleId)
             .ExecuteDeleteAsync(cancellationToken);
 
-    public async Task BulkDeleteClaimsAsync(string roleId, IEnumerable<string> claimValue, CancellationToken cancellationToken = default)
+    public async Task DeleteClaimsAsync(string roleId, IEnumerable<string> claimValue, CancellationToken cancellationToken = default)
         => await _context.RoleClaims
             .Where(rc => rc.RoleId == roleId && claimValue.Contains(rc.ClaimValue))
             .ExecuteDeleteAsync(cancellationToken);
+
+    public async Task ToggleStatusAsync(Role role, CancellationToken cancellationToken = default)
+        => await _context.Roles
+            .Where(r => r.Id == role.Id)
+            .ExecuteUpdateAsync
+            (
+                r => r.SetProperty(x => x.IsDefault, x => !x.IsDefault)
+                , cancellationToken
+            );
 
     #endregion
 

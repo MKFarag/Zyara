@@ -29,7 +29,7 @@ public class UsersController(IUserManagementService userManagementService) : Con
         var result = await _userManagementService.AddAsync(request, cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
+            ? CreatedAtAction(nameof(Get), new { result.Value.Id }, result.Value)
             : result.ToProblem();
     }
 
