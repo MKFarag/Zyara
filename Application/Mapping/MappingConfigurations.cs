@@ -1,4 +1,6 @@
-﻿namespace Application.Mapping;
+﻿using System.Collections.Immutable;
+
+namespace Application.Mapping;
 
 public class MappingConfigurations : IRegister
 {
@@ -32,5 +34,9 @@ public class MappingConfigurations : IRegister
         config.NewConfig<(Role role, IEnumerable<string> permissions), RoleDetailResponse>()
             .Map(dest => dest, src => src.role)
             .Map(dest => dest.Permissions, src => src.permissions);
+
+        config.NewConfig<DeliveryMan, DeliveryManDetailResponse>()
+            .Map(dest => dest.OrdersId, src => src.Orders.Select(x => x.Id))
+            .Map(dest => dest.TotalOrders, src => src.Orders.Count());
     }
 }
