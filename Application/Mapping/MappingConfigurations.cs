@@ -10,7 +10,8 @@ public class MappingConfigurations : IRegister
             .Map(dest => dest.CurrentPrice, src => src.SellingPrice);
 
         config.NewConfig<Order, OrderResponse>()
-            .Map(dest => dest.OrderDate, src => DateOnly.FromDateTime(src.OrderDate));
+            .Map(dest => dest.OrderDate, src => DateOnly.FromDateTime(src.OrderDate))
+            .Map(dest => dest.GrandTotal, src => src.TotalAmount + src.ShippingCost);
 
         config.NewConfig<Order, OrderManagementResponse>()
             .Map(dest => dest.OrderDate, src => DateOnly.FromDateTime(src.OrderDate))
@@ -36,7 +37,6 @@ public class MappingConfigurations : IRegister
             .Map(dest => dest.Permissions, src => src.permissions);
 
         config.NewConfig<DeliveryMan, DeliveryManDetailResponse>()
-            .Map(dest => dest.OrdersId, src => src.Orders.Select(x => x.Id))
             .Map(dest => dest.TotalOrders, src => src.Orders.Count());
     }
 }

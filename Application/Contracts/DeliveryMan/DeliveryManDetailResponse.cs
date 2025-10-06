@@ -6,5 +6,5 @@ public record DeliveryManDetailResponse(
     string PhoneNumber,
     bool IsDisabled,
     int TotalOrders,
-    IEnumerable<string> OrdersId
+    IEnumerable<DeliveryManOrderResponse> Orders
 );

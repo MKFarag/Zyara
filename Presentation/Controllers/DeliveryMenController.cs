@@ -22,6 +22,16 @@ public class DeliveryMenController(IDeliveryManService deliveryManService) : Con
             : result.ToProblem();
     }
 
+    [HttpGet("{id}/orders")]
+    public async Task<IActionResult> GetOrders([FromRoute] int id, CancellationToken cancellationToken)
+    {
+        var result = await _deliveryManService.GetOrdersAsync(id, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : result.ToProblem();
+    }
+
     [HttpPost("")]
     public async Task<IActionResult> Add([FromBody] DeliveryManRequest request, CancellationToken cancellationToken)
     {
@@ -36,6 +46,16 @@ public class DeliveryMenController(IDeliveryManService deliveryManService) : Con
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] DeliveryManRequest request, CancellationToken cancellationToken)
     {
         var result = await _deliveryManService.UpdateAsync(id, request, cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : result.ToProblem();
+    }
+
+    [HttpPut("{deliveryManId}/set-order/{orderId}")]
+    public async Task<IActionResult> SetToOrder([FromRoute] int deliveryManId, [FromRoute] int orderId, CancellationToken cancellationToken)
+    {
+        var result = await _deliveryManService.SetToOrderAsync(deliveryManId, orderId, cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

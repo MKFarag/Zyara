@@ -94,10 +94,13 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         if (customer.CartItems.Any(x => !x.Product.IsAvailable))
             return Result.Failure(ProductErrors.NotAvailable);
 
+        var shippingCost = CalculateShippingCost(totalPrice);
+
         var order = new Order
         {
             CustomerId = customer.Id,
             TotalAmount = totalPrice,
+            ShippingCost = shippingCost,
             Status = OrderStatus.Pending,
             ShippingAddress = defaultAddress.ToString()
         };
@@ -154,5 +157,14 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         await _unitOfWork.CompleteAsync(cancellationToken);
 
         return Result.Success();
+    }
+
+    private static decimal CalculateShippingCost(decimal orderTotal)
+    {
+        const decimal baseFee = 25m;
+        const decimal percentage = 0.03m;
+
+        var shippingCost = baseFee + (orderTotal * percentage);
+        return Math.Round(shippingCost, 2);
     }
 }

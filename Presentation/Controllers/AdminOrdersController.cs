@@ -94,4 +94,14 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
             ? Ok(result.Value)
             : result.ToProblem();
     }
+
+    [HttpPut("{id}/change-status")]
+    public async Task<IActionResult> ChangeStatus([FromRoute] int id, [FromBody] OrderStatusRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _orderManagementService.ChangeStatusAsync(id, request, cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : result.ToProblem();
+    }
 }
