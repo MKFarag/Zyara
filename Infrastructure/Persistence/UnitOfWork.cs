@@ -1,5 +1,4 @@
-﻿using Domain.Entities;
-using Infrastructure.Persistence.Repositories;
+﻿using Infrastructure.Persistence.Repositories;
 
 namespace Infrastructure.Persistence;
 

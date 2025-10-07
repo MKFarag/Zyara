@@ -10,6 +10,7 @@ global using Application.Interfaces.Infrastructure;
 global using Application.Contracts.Auth;
 global using Domain.Errors;
 global using Microsoft.AspNetCore.Http;
+global using Domain.Settings;
 global using Application.Contracts.Common;
 global using Application.Contracts.Product;
 global using Application.Contracts.Order;

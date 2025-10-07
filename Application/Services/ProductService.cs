@@ -1,11 +1,11 @@
 ﻿namespace Application.Services;
 
-public class ProductService(IUnitOfWork unitOfWork) : IProductService
+public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStorageService) : IProductService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IFileStorageService _fileStorageService = fileStorageService;
 
     private static readonly string _allowedSearchColumn = nameof(Product.Name);
-
     private static readonly HashSet<string> _allowedSortColumns = new(StringComparer.OrdinalIgnoreCase) 
     { nameof(Product.Id), nameof(Product.CurrentPrice) };
 
@@ -141,5 +141,12 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
         await _unitOfWork.CompleteAsync(cancellationToken);
 
         return Result.Success();
+    }
+
+    private async Task UploadImageAsync(IFormFile image, CancellationToken cancellationToken = default)
+    {
+        var path = _fileStorageService.ImagesPathCombiner(image.FileName);
+
+        await _fileStorageService.SaveFileAsync(image, path, cancellationToken);
     }
 }
