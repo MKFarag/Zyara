@@ -11,5 +11,5 @@ public sealed class Product
 
     public bool IsAvailable => StorageQuantity > 0;
 
-    // TODO: Add ProductImage table and its navigation property
+    public ICollection<ProductImage> Images { get; set; } = [];
 }

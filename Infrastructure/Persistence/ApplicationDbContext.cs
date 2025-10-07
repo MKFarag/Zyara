@@ -19,6 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Order> Orders { get; set; } = default!;
     public DbSet<OrderItem> OrderItems { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
+    public DbSet<ProductImage> ProductImages { get; set; } = default!;
 
     #endregion
 
@@ -35,6 +36,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         foreach (var fk in cascadeFk)
             fk.DeleteBehavior = DeleteBehavior.Restrict;
+
+        #endregion
+
+        #region Allow Cascade Delete for Product -> ProductImages
+
+        builder.Entity<ProductImage>()
+            .HasOne<Product>()
+            .WithMany(p => p.Images)
+            .HasForeignKey(pi => pi.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         #endregion
 
