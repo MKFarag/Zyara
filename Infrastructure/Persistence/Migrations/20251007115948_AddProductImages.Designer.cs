@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251007102214_AddProductImages")]
+    [Migration("20251007115948_AddProductImages")]
     partial class AddProductImages
     {
         /// <inheritdoc />
@@ -262,11 +262,6 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");

@@ -18,7 +18,6 @@ namespace Infrastructure.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     IsMain = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>

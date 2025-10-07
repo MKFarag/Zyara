@@ -1,4 +1,6 @@
-﻿namespace Application.Services;
+﻿using Domain.Entities;
+
+namespace Application.Services;
 
 public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStorageService) : IProductService
 {
@@ -68,6 +70,38 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         await _unitOfWork.CompleteAsync(cancellationToken);
 
         return Result.Success(product.Adapt<ProductResponse>());
+    }
+
+    public async Task<Result> AddImageAsync(int id, IFormFile image, CancellationToken cancellationToken = default)
+    {
+        var product = await _unitOfWork.Products.TrackedFindAsync
+            (
+                p => p.Id == id,
+                [nameof(Product.Images)],
+                cancellationToken
+            );
+
+        if (product is null)
+            return Result.Failure(ProductErrors.NotFound);
+
+        var path = _fileStorageService.ImagesPathCombiner(GetName(image, id));
+
+        await _fileStorageService.SaveAsync(image, path, cancellationToken);
+
+        bool isMain = false;
+
+        if (product.Images.Count == 0)
+            isMain = true;
+
+        product.Images.Add(new ProductImage
+        {
+            Url = path,
+            IsMain = isMain
+        });
+
+        await _unitOfWork.CompleteAsync(cancellationToken);
+
+        return Result.Success();
     }
 
     public async Task<Result> UpdateAsync(int id, UpdateProductRequest request, CancellationToken cancellationToken = default)
@@ -143,10 +177,6 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         return Result.Success();
     }
 
-    private async Task UploadImageAsync(IFormFile image, CancellationToken cancellationToken = default)
-    {
-        var path = _fileStorageService.ImagesPathCombiner(image.FileName);
-
-        await _fileStorageService.SaveAsync(image, path, cancellationToken);
-    }
+    private static string GetName(IFormFile image, int productId)
+        => $"{Path.GetFileNameWithoutExtension(image.FileName)}-{productId}{Path.GetExtension(image.FileName)}";
 }
