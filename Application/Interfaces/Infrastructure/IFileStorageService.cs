@@ -2,6 +2,7 @@
 
 public interface IFileStorageService
 {
-    Task SaveFileAsync(IFormFile file, string path, CancellationToken cancellationToken = default);
+    Task SaveAsync(IFormFile file, string path, CancellationToken cancellationToken = default);
+    Task RemoveAsync(string path, CancellationToken cancellationToken = default);
     string ImagesPathCombiner(string imageName);
 }

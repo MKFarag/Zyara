@@ -147,6 +147,6 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
     {
         var path = _fileStorageService.ImagesPathCombiner(image.FileName);
 
-        await _fileStorageService.SaveFileAsync(image, path, cancellationToken);
+        await _fileStorageService.SaveAsync(image, path, cancellationToken);
     }
 }
