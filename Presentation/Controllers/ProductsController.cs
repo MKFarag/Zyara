@@ -1,4 +1,5 @@
-﻿using Application.Contracts.Product;
+﻿using Application.Contracts.Files;
+using Application.Contracts.Product;
 
 namespace Presentation.Controllers;
 
@@ -33,6 +34,16 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(Get), new { result.Value.Id }, result.Value)
+            : result.ToProblem();
+    }
+
+    [HttpPost("{id}/image")]
+    public async Task<IActionResult> AddImage([FromRoute] int id, [FromForm] UploadImageRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _productService.AddImageAsync(id, request.Image, cancellationToken);
+
+        return result.IsSuccess
+            ? Created()
             : result.ToProblem();
     }
 
