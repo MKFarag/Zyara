@@ -5,3 +5,4 @@ global using Microsoft.AspNetCore.Mvc;
 global using Application.Interfaces.Application;
 global using Application.Contracts.Common;
 global using Microsoft.AspNetCore.Authorization;
+global using FluentValidation;

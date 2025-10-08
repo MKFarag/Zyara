@@ -2,9 +2,15 @@
 
 namespace Infrastructure.Services;
 
-public class FileStorageService(IWebHostEnvironment webHostEnvironment) : IFileStorageService
+public class FileStorageService : IFileStorageService
 {
-    private readonly string _imagesPath = $"{webHostEnvironment.WebRootPath}/images";
+    private readonly string _imagesFolder = "/images";
+    private readonly string _imagesPath;
+
+    public FileStorageService(IWebHostEnvironment webHostEnvironment)
+    {
+        _imagesPath = webHostEnvironment.WebRootPath + _imagesFolder;
+    }
 
     public async Task SaveAsync(IFormFile file, string path, CancellationToken cancellationToken = default)
     {
@@ -23,5 +29,8 @@ public class FileStorageService(IWebHostEnvironment webHostEnvironment) : IFileS
 
     public string ImagesPathCombiner(string imageName)
         => Path.Combine(_imagesPath, imageName);
+
+    public static string GetRelativeImageUrl(string fileName)
+        => Path.Combine("/images", fileName).Replace("\\", "/");
 }
 

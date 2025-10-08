@@ -38,9 +38,29 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpPost("{id}/image")]
-    public async Task<IActionResult> AddImage([FromRoute] int id, [FromForm] UploadImageRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddImage([FromRoute] int id, [FromForm] UploadImageRequest request, [FromServices] IValidator<UploadImageRequest> validator, CancellationToken cancellationToken)
     {
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return this.ToProblem(validationResult);
+
         var result = await _productService.AddImageAsync(id, request.Image, cancellationToken);
+
+        return result.IsSuccess
+            ? Created()
+            : result.ToProblem();
+    }
+
+    [HttpPost("{id}/images")]
+    public async Task<IActionResult> AddImage([FromRoute] int id, [FromForm] UploadImagesRequest request, [FromServices] IValidator<UploadImagesRequest> validator, CancellationToken cancellationToken)
+    {
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return this.ToProblem(validationResult);
+
+        var result = await _productService.AddImagesAsync(id, request.Images, cancellationToken);
 
         return result.IsSuccess
             ? Created()

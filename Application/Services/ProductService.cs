@@ -104,6 +104,11 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         return Result.Success();
     }
 
+    public async Task<Result> AddImagesAsync(int id, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Result> UpdateAsync(int id, UpdateProductRequest request, CancellationToken cancellationToken = default)
     {
         if (await _unitOfWork.Products.AnyAsync(p => p.Name == request.Name && p.Id != id, cancellationToken))

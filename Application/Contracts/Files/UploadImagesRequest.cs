@@ -12,7 +12,8 @@ public class UploadImagesRequestValidator : AbstractValidator<UploadImagesReques
     {
         RuleForEach(x => x.Images)
             .SetValidator(new FileSizeValidator())
-            .SetValidator(new BlockedSignaturesValidator());
+            .SetValidator(new BlockedSignaturesValidator())
+            .SetValidator(new FileNameValidator());
 
         RuleFor(x => x.Images)
             .Must((request, context) =>
