@@ -7,5 +7,6 @@ public record ProductDetailsResponse(
     decimal CurrentPrice,
     decimal SellingPrice,
     int StorageQuantity,
-    bool IsAvailable
+    bool IsAvailable,
+    IEnumerable<ProductImageResponse> Images
 );

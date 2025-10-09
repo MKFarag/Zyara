@@ -9,6 +9,9 @@ public class MappingConfigurations : IRegister
         config.NewConfig<ProductRequest, Product>()
             .Map(dest => dest.CurrentPrice, src => src.SellingPrice);
 
+        config.NewConfig<Product, ProductResponse>()
+            .Map(dest => dest.MainImageUrl, src => src.Images.First(pi => pi.IsMain).Url);
+
         config.NewConfig<Order, OrderResponse>()
             .Map(dest => dest.OrderDate, src => DateOnly.FromDateTime(src.OrderDate))
             .Map(dest => dest.GrandTotal, src => src.TotalAmount + src.ShippingCost);
@@ -19,7 +22,8 @@ public class MappingConfigurations : IRegister
             .Map(dest => dest.TotalAmount, src => src.TotalAmount - src.ShippingCost);
 
         config.NewConfig<Product, OrderProductResponse>()
-            .Map(dest => dest.UnitPrice, src => src.CurrentPrice);
+            .Map(dest => dest.UnitPrice, src => src.CurrentPrice)
+            .Map(dest => dest.MainImageUrl, src => src.Images.First(pi => pi.IsMain).Url);
 
         config.NewConfig<(Order order, User user, string phoneNumber), OrderDetailsResponse>()
             .Map(dest => dest.Order, src => src.order)

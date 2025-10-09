@@ -37,23 +37,8 @@ public class ProductsController(IProductService productService) : ControllerBase
             : result.ToProblem();
     }
 
-    [HttpPost("{id}/image")]
-    public async Task<IActionResult> AddImage([FromRoute] int id, [FromForm] UploadImageRequest request, [FromServices] IValidator<UploadImageRequest> validator, CancellationToken cancellationToken)
-    {
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-            return this.ToProblem(validationResult);
-
-        var result = await _productService.AddImageAsync(id, request.Image, cancellationToken);
-
-        return result.IsSuccess
-            ? Created()
-            : result.ToProblem();
-    }
-
     [HttpPost("{id}/images")]
-    public async Task<IActionResult> AddImage([FromRoute] int id, [FromForm] UploadImagesRequest request, [FromServices] IValidator<UploadImagesRequest> validator, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddImages([FromRoute] int id, [FromForm] UploadImagesRequest request, [FromServices] IValidator<UploadImagesRequest> validator, CancellationToken cancellationToken)
     {
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
@@ -64,6 +49,26 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return result.IsSuccess
             ? Created()
+            : result.ToProblem();
+    }
+
+    [HttpPut("{productId}/images/{imageId}")]
+    public async Task<IActionResult> SetMain([FromRoute] int productId, [FromRoute] int imageId, CancellationToken cancellationToken)
+    {
+        var result = await _productService.SetMainImageAsync(productId, imageId, cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : result.ToProblem();
+    }
+
+    [HttpDelete("{productId}/images/{imageId}")]
+    public async Task<IActionResult> DeleteImage([FromRoute] int productId, [FromRoute] int imageId, CancellationToken cancellationToken)
+    {
+        var result = await _productService.DeleteImageAsync(productId, imageId, cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
             : result.ToProblem();
     }
 

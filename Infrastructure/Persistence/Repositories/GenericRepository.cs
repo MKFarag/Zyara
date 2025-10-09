@@ -6,6 +6,8 @@ public class GenericRepository<TEntity, TKey>(ApplicationDbContext context) : Ba
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
     private readonly ApplicationDbContext _context = context;
+    private const int _maxIncludeDepth = 2;
+    private const int _maxIncludeCount = 3;
 
     #region Read
 
@@ -36,6 +38,9 @@ public class GenericRepository<TEntity, TKey>(ApplicationDbContext context) : Ba
         foreach (var include in includes)
             query = query.Include(include);
 
+        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
+            query = query.AsSingleQuery();
+
         return query;
     }
 
@@ -45,6 +50,9 @@ public class GenericRepository<TEntity, TKey>(ApplicationDbContext context) : Ba
 
         foreach (var include in includes)
             query = query.Include(include);
+
+        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
+            query = query.AsSingleQuery();
 
         return await query.ToListAsync(cancellationToken);
     }
@@ -56,6 +64,9 @@ public class GenericRepository<TEntity, TKey>(ApplicationDbContext context) : Ba
         foreach (var include in includes)
             query = query.Include(include);
 
+        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
+            query = query.AsSingleQuery();
+
         return query;
     }
 
@@ -65,6 +76,9 @@ public class GenericRepository<TEntity, TKey>(ApplicationDbContext context) : Ba
 
         foreach (var include in includes)
             query = query.Include(include);
+
+        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
+            query = query.AsSingleQuery();
 
         return await query.ToListAsync(cancellationToken);
     }

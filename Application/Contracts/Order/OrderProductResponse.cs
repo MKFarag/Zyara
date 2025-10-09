@@ -3,5 +3,6 @@
 public record OrderProductResponse(
     int Id,
     string Name,
-    decimal UnitPrice
+    decimal UnitPrice,
+    string MainImageUrl
 );

@@ -5,5 +5,6 @@ public record ProductResponse(
     string Name,
     string Description,
     decimal CurrentPrice,
-    bool IsAvailable
+    bool IsAvailable,
+    string MainImageUrl
 );

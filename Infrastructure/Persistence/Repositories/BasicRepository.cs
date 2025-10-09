@@ -3,6 +3,8 @@
 public class BasicRepository<TEntity>(ApplicationDbContext context) : IBasicRepository<TEntity> where TEntity : class
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
+    private const int _maxIncludeDepth = 2;
+    private const int _maxIncludeCount = 3;
 
     #region Read
 
@@ -16,6 +18,9 @@ public class BasicRepository<TEntity>(ApplicationDbContext context) : IBasicRepo
         foreach (var include in includes)
             query = query.Include(include);
 
+        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
+            query = query.AsSplitQuery();
+
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -28,6 +33,9 @@ public class BasicRepository<TEntity>(ApplicationDbContext context) : IBasicRepo
 
         foreach (var include in includes)
             query = query.Include(include);
+
+        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
+            query = query.AsSplitQuery();
 
         return await query.ToListAsync(cancellationToken);
     }

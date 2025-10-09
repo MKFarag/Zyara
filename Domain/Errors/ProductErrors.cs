@@ -2,6 +2,18 @@
 
 public record ProductErrors
 {
+    public partial class Image
+    {
+        public static readonly Error NotFound =
+            new("Product.Image.NotFound", "No image found", StatusCodes.NotFound);
+
+        public static readonly Error AlreadyMain =
+            new("Product.Image.AlreadyMain", "This image is the main already", StatusCodes.BadRequest);
+
+        public static readonly Error DeleteMain =
+            new("Product.Image.DeleteMain", "This image is the main", StatusCodes.BadRequest);
+    }
+
     public static readonly Error NotFound =
         new("Product.NotFound", "No product found", StatusCodes.NotFound);
 

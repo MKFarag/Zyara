@@ -1,6 +1,4 @@
-﻿using Domain.Entities;
-
-namespace Application.Services;
+﻿namespace Application.Services;
 
 public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStorageService) : IProductService
 {
@@ -28,6 +26,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
                     checkedFilters.SortColumn!,
                     checkedFilters.SortDirection!,
                     ColumnType.String,
+                    [nameof(Product.Images)],
                     cancellationToken
                 );
         else
@@ -42,6 +41,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
                     checkedFilters.SortColumn!,
                     checkedFilters.SortDirection!,
                     ColumnType.String,
+                    [nameof(Product.Images)],
                     cancellationToken
                 );
 
@@ -50,8 +50,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
 
     public async Task<Result<ProductDetailsResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
     {
-        if (await _unitOfWork.Products.GetAsync(id, cancellationToken) is not { } product)
-            return Result.Failure<ProductDetailsResponse>(ProductErrors.NotFound);
+        var product = await _unitOfWork.Products.FindAsync(p => p.Id == id, [nameof(Product.Images)], cancellationToken);
 
         var response = product.Adapt<ProductDetailsResponse>();
 
@@ -72,41 +71,89 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         return Result.Success(product.Adapt<ProductResponse>());
     }
 
-    public async Task<Result> AddImageAsync(int id, IFormFile image, CancellationToken cancellationToken = default)
+    public async Task<Result> AddImagesAsync(int id, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default)
     {
         var product = await _unitOfWork.Products.TrackedFindAsync
-            (
-                p => p.Id == id,
-                [nameof(Product.Images)],
-                cancellationToken
-            );
+        (
+            p => p.Id == id,
+            [nameof(Product.Images)],
+            cancellationToken
+        );
 
         if (product is null)
             return Result.Failure(ProductErrors.NotFound);
 
-        var path = _fileStorageService.ImagesPathCombiner(GetName(image, id));
-
-        await _fileStorageService.SaveAsync(image, path, cancellationToken);
-
-        bool isMain = false;
-
-        if (product.Images.Count == 0)
-            isMain = true;
-
-        product.Images.Add(new ProductImage
+        foreach (var image in images)
         {
-            Url = path,
-            IsMain = isMain
-        });
+            var relativePath = await _fileStorageService.SaveAsync(image, FileTypes.Image, GetName(image), cancellationToken);
+
+            product.Images.Add(new ProductImage
+            {
+                Url = relativePath,
+                IsMain = false
+            });
+        }
+
+        if (!product.Images.Any(pi => pi.IsMain))
+            product.Images.First().IsMain = true;
 
         await _unitOfWork.CompleteAsync(cancellationToken);
 
         return Result.Success();
     }
 
-    public async Task<Result> AddImagesAsync(int id, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default)
+    public async Task<Result> SetMainImageAsync(int productId, int imageId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var product = await _unitOfWork.Products.TrackedFindAsync
+        (
+            p => p.Id == productId,
+            [nameof(Product.Images)],
+            cancellationToken
+        );
+
+        if (product is null)
+            return Result.Failure(ProductErrors.NotFound);
+
+        if (product.Images.FirstOrDefault(pi => pi.Id == imageId) is not { } image)
+            return Result.Failure(ProductErrors.Image.NotFound);
+
+        if (image.IsMain)
+            return Result.Failure(ProductErrors.Image.AlreadyMain);
+
+        product.Images.First(pi => pi.IsMain).IsMain = false;
+
+        image.IsMain = true;
+
+        await _unitOfWork.CompleteAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> DeleteImageAsync(int productId, int imageId, CancellationToken cancellationToken = default)
+    {
+        var product = await _unitOfWork.Products.TrackedFindAsync
+        (
+            p => p.Id == productId,
+            [nameof(Product.Images)],
+            cancellationToken
+        );
+
+        if (product is null)
+            return Result.Failure(ProductErrors.NotFound);
+
+        if (product.Images.FirstOrDefault(pi => pi.Id == imageId) is not { } image)
+            return Result.Failure(ProductErrors.Image.NotFound);
+
+        if (image.IsMain)
+            return Result.Failure(ProductErrors.Image.DeleteMain);
+
+        await _fileStorageService.RemoveAsync(image.Url, cancellationToken);
+
+        product.Images.Remove(image);
+
+        await _unitOfWork.CompleteAsync(cancellationToken);
+
+        return Result.Success();
     }
 
     public async Task<Result> UpdateAsync(int id, UpdateProductRequest request, CancellationToken cancellationToken = default)
@@ -182,6 +229,6 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         return Result.Success();
     }
 
-    private static string GetName(IFormFile image, int productId)
-        => $"{Path.GetFileNameWithoutExtension(image.FileName)}-{productId}{Path.GetExtension(image.FileName)}";
+    private static string GetName(IFormFile image)
+        => $"{Path.GetFileNameWithoutExtension(image.FileName)}-{Guid.CreateVersion7()}{Path.GetExtension(image.FileName)}";
 }

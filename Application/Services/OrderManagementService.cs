@@ -26,7 +26,7 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
                 checkedFilters.SortColumn!,
                 checkedFilters.SortDirection!,
                 ColumnType.String,
-                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
+                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}.{nameof(Product.Images)}"],
                 cancellationToken
             );
 

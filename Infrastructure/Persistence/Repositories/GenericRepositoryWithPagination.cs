@@ -8,6 +8,8 @@ public class GenericRepositoryWithPagination<TEntity, TKey>(ApplicationDbContext
     where TKey : notnull
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
+    private const int _maxIncludeDepth = 2;
+    private const int _maxIncludeCount = 3;
 
     public async Task<IPaginatedList<TProjection>> GetPaginatedListAsync<TProjection>(
         int pageNumber, int pageSize, string? searchValue, string? searchColumn, string sortColumn, string sortDirection,
@@ -32,6 +34,9 @@ public class GenericRepositoryWithPagination<TEntity, TKey>(ApplicationDbContext
 
         foreach (var include in includes)
             query = query.Include(include);
+
+        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
+            query = query.AsSplitQuery();
 
         var finalQuery = query.OrderBy($"{sortColumn} {sortDirection}").ProjectToType<TProjection>();
 
@@ -63,6 +68,9 @@ public class GenericRepositoryWithPagination<TEntity, TKey>(ApplicationDbContext
 
         foreach (var include in includes)
             query = query.Include(include);
+
+        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
+            query = query.AsSplitQuery();
 
         var finalQuery = query.OrderBy($"{sortColumn} {sortDirection}").ProjectToType<TProjection>();
 

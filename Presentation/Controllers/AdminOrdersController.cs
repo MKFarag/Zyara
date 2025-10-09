@@ -4,7 +4,7 @@ namespace Presentation.Controllers;
 
 [Route("api/admin/orders")]
 [ApiController]
-[Authorize]
+//[Authorize]
 public class AdminOrdersController(IOrderManagementService orderManagementService) : ControllerBase
 {
     private readonly IOrderManagementService _orderManagementService = orderManagementService;

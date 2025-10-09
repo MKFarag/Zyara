@@ -14,7 +14,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             .FindAllAsync
             (
                 o => o.CustomerId == customerId && o.OrderDate.Year == year,
-                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
+                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}.{nameof(Product.Images)}"],
                 cancellationToken
             );
 
@@ -27,7 +27,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             .FindAsync
             (
                 o => o.Id == orderId,
-                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"],
+                [$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}.{nameof(Product.Images)}"],
                 cancellationToken
             );
 
