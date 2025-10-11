@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Persistence.Repositories;
 
-public class CustomerRepository(ApplicationDbContext context) : GenericRepository<Customer, string>(context), ICustomerRepository
+public class CustomerRepository(ApplicationDbContext context) : GenericRepository<Customer>(context), ICustomerRepository
 {
     private readonly ApplicationDbContext _context = context;
 

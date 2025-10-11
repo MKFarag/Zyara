@@ -2,13 +2,13 @@
 
 public interface IUnitOfWork : IDisposable
 {
-    IGenericRepository<Address, int> Addresses { get; }
-    IBasicRepository<Cart> Carts { get; }
+    IGenericRepository<Address> Addresses { get; }
+    IGenericRepository<Cart> Carts { get; }
     ICustomerRepository Customers { get; }
-    IGenericRepository<DeliveryMan, int> DeliveryMen { get; }
-    IGenericRepositoryWithPagination<Order, int> Orders { get; }
-    IGenericRepository<OrderItem, int> OrderItems { get; }
-    IGenericRepositoryWithPagination<Product, int> Products { get; }
+    IGenericRepository<DeliveryMan> DeliveryMen { get; }
+    IGenericRepositoryWithPagination<Order> Orders { get; }
+    IGenericRepository<OrderItem> OrderItems { get; }
+    IGenericRepositoryWithPagination<Product> Products { get; }
     IRoleRepository Roles { get; }
     IUserRepository Users { get; }
 

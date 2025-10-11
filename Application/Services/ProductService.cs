@@ -85,11 +85,13 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
 
         foreach (var image in images)
         {
-            var relativePath = await _fileStorageService.SaveAsync(image, FileTypes.Image, GetName(image), cancellationToken);
+            var imageName = GetName(image);
+
+            await _fileStorageService.SaveAsync(image, FileTypes.Image, imageName, cancellationToken);
 
             product.Images.Add(new ProductImage
             {
-                Url = relativePath,
+                Url = _fileStorageService.GetRelativePath(imageName, FileTypes.Image),
                 IsMain = false
             });
         }
@@ -161,7 +163,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         if (await _unitOfWork.Products.AnyAsync(p => p.Name == request.Name && p.Id != id, cancellationToken))
             return Result.Failure<ProductResponse>(ProductErrors.DuplicatedName);
 
-        if (await _unitOfWork.Products.GetAsync(id, cancellationToken) is not { } product)
+        if (await _unitOfWork.Products.GetAsync([id], cancellationToken) is not { } product)
             return Result.Failure(ProductErrors.NotFound);
 
         product = request.Adapt(product);
@@ -173,7 +175,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
 
     public async Task<Result> UpdateCurrentPriceAsync(int id, decimal price, CancellationToken cancellationToken = default)
     {
-        if (await _unitOfWork.Products.GetAsync(id, cancellationToken) is not { } product)
+        if (await _unitOfWork.Products.GetAsync([id], cancellationToken) is not { } product)
             return Result.Failure(ProductErrors.NotFound);
 
         if (product.SellingPrice < price)
@@ -188,7 +190,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
 
     public async Task<Result> UpdateSellingPriceAsync(int id, decimal price, CancellationToken cancellationToken = default)
     {
-        if (await _unitOfWork.Products.GetAsync(id, cancellationToken) is not { } product)
+        if (await _unitOfWork.Products.GetAsync([id], cancellationToken) is not { } product)
             return Result.Failure(ProductErrors.NotFound);
 
         product.SellingPrice = price;
@@ -201,7 +203,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
 
     public async Task<Result> IncreaseStorageAsync(int id, int quantity, CancellationToken cancellationToken = default)
     {
-        if (await _unitOfWork.Products.GetAsync(id, cancellationToken) is not { } product)
+        if (await _unitOfWork.Products.GetAsync([id], cancellationToken) is not { } product)
             return Result.Failure(ProductErrors.NotFound);
 
         product.StorageQuantity += quantity;
@@ -213,7 +215,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
 
     public async Task<Result> DecreaseStorageAsync(int id, int quantity, CancellationToken cancellationToken = default)
     {
-        if (await _unitOfWork.Products.GetAsync(id, cancellationToken) is not { } product)
+        if (await _unitOfWork.Products.GetAsync([id], cancellationToken) is not { } product)
             return Result.Failure(ProductErrors.NotFound);
 
         if (product.StorageQuantity == 0)

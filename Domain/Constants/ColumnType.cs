@@ -4,6 +4,5 @@ public enum ColumnType
 {
     String,
     Int,
-    Date,
     Bool
 }

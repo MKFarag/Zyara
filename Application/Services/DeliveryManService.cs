@@ -32,7 +32,7 @@ public class DeliveryManService(IUnitOfWork unitOfWork) : IDeliveryManService
 
     public async Task<Result<IEnumerable<DeliveryManOrderResponse>>> GetOrdersAsync(int id, CancellationToken cancellationToken = default)
     {
-        if (!await _unitOfWork.DeliveryMen.ExistsAsync(id, cancellationToken))
+        if (!await _unitOfWork.DeliveryMen.AnyAsync(d => d.Id == id, cancellationToken))
             return Result.Failure<IEnumerable<DeliveryManOrderResponse>>(DeliveryManErrors.NotFound);
 
         var orders = await _unitOfWork.Orders
@@ -66,7 +66,7 @@ public class DeliveryManService(IUnitOfWork unitOfWork) : IDeliveryManService
         if (await _unitOfWork.DeliveryMen.AnyAsync(d => d.PhoneNumber == request.PhoneNumber && d.Id != id, cancellationToken))
             return Result.Failure(DeliveryManErrors.DuplicatedPhoneNumber);
 
-        if (await _unitOfWork.DeliveryMen.GetAsync(id, cancellationToken) is not { } deliveryMan)
+        if (await _unitOfWork.DeliveryMen.GetAsync([id], cancellationToken) is not { } deliveryMan)
             return Result.Failure(DeliveryManErrors.NotFound);
 
         deliveryMan = request.Adapt(deliveryMan);
@@ -78,13 +78,13 @@ public class DeliveryManService(IUnitOfWork unitOfWork) : IDeliveryManService
 
     public async Task<Result> SetToOrderAsync(int deliveryManId, int orderId, CancellationToken cancellationToken = default)
     {
-        if (await _unitOfWork.DeliveryMen.GetAsync(deliveryManId, cancellationToken) is not { } deliveryMan)
+        if (await _unitOfWork.DeliveryMen.GetAsync([deliveryManId], cancellationToken) is not { } deliveryMan)
             return Result.Failure(DeliveryManErrors.NotFound);
 
         if (deliveryMan.IsDisabled)
             return Result.Failure(DeliveryManErrors.Disabled);
 
-        if (await _unitOfWork.Orders.GetAsync(orderId, cancellationToken) is not { } order)
+        if (await _unitOfWork.Orders.GetAsync([orderId], cancellationToken) is not { } order)
             return Result.Failure(OrderErrors.NotFound);
 
         if (order.Status is OrderStatus.Delivered or OrderStatus.Canceled)
@@ -100,7 +100,7 @@ public class DeliveryManService(IUnitOfWork unitOfWork) : IDeliveryManService
 
     public async Task<Result> ToggleStatusAsync(int id, CancellationToken cancellationToken = default)
     {
-        if (await _unitOfWork.DeliveryMen.GetAsync(id, cancellationToken) is not { } deliveryMan)
+        if (await _unitOfWork.DeliveryMen.GetAsync([id], cancellationToken) is not { } deliveryMan)
             return Result.Failure(DeliveryManErrors.NotFound);
 
         deliveryMan.IsDisabled = !deliveryMan.IsDisabled;

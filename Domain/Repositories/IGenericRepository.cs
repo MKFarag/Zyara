@@ -2,108 +2,40 @@
 
 /// <summary>Generic repository interface for CRUD operations</summary>
 /// <typeparam name="TEntity">The entity type</typeparam>
-/// <typeparam name="TKey">The type of the entity's primary key</typeparam>
-public interface IGenericRepository<TEntity, TKey> : IBasicRepository<TEntity>
-    where TEntity : class
-    where TKey : notnull
+public interface IGenericRepository<TEntity> where TEntity : class
 {
     #region Read
 
-    #region Get
+    #region Basic
 
     /// <summary>Get trackable entity by ID</summary>
-    /// <param name="id">Entity ID</param>
-    TEntity? Get(TKey id);
-
-    /// <summary>Get trackable entity by ID</summary>
-    /// <param name="id">Entity ID</param>
-    Task<TEntity?> GetAsync(TKey id, CancellationToken cancellationToken = default);
-
-    /// <summary>Get all entities</summary>
-    IEnumerable<TEntity> GetAll();
+    /// <param name="keyValues">Entity IDs</param>
+    Task<TEntity?> GetAsync(object[] keyValues, CancellationToken cancellationToken = default);
 
     /// <summary>Get all entities</summary>
     Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>Get all trackable entities</summary>
-    IEnumerable<TEntity> TrackedGetAll();
-
-    /// <summary>Get all trackable entities</summary>
-    Task<IEnumerable<TEntity>> TrackedGetAllAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>Get all entities</summary>
-    /// <param name="includes">Related data to include</param>
-    IEnumerable<TEntity> GetAll(string[] includes);
 
     /// <summary>Get all entities</summary>
     /// <param name="includes">Related data to include</param>
     Task<IEnumerable<TEntity>> GetAllAsync(string[] includes, CancellationToken cancellationToken = default);
 
-    /// <summary>Get all trackable entities</summary>
-    /// <param name="includes">Related data to include</param>
-    IEnumerable<TEntity> TrackedGetAll(string[] includes);
-
-    /// <summary>Get all trackable entities</summary>
-    /// <param name="includes">Related data to include</param>
-    Task<IEnumerable<TEntity>> TrackedGetAllAsync(string[] includes, CancellationToken cancellationToken = default);
-
-    #endregion
-
-    #region Find
-
     /// <summary>Find first entity matching condition</summary>
     /// <param name="predicate">Filter condition</param>
-    TEntity? Find(Expression<Func<TEntity, bool>> predicate);
-
-    /// <summary>Find first trackable entity matching condition</summary>
-    /// <param name="predicate">Filter condition</param>
-    TEntity? TrackedFind(Expression<Func<TEntity, bool>> predicate);
+    Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>Find first entity matching condition</summary>
     /// <param name="predicate">Filter condition</param>
     /// <param name="includes">Related data to include</param>
-    TEntity? Find(Expression<Func<TEntity, bool>> predicate, string[] includes);
-
-    /// <summary>Find first trackable entity matching condition</summary>
-    /// <param name="predicate">Filter condition</param>
-    /// <param name="includes">Related data to include</param>
-    TEntity? TrackedFind(Expression<Func<TEntity, bool>> predicate, string[] includes);
-
-    /// <summary>Find first trackable entity matching condition</summary>
-    /// <param name="predicate">Filter condition</param>
-    /// <param name="includes">Related data to include</param>
-    Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
+    Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
 
     /// <summary>Find all entities matching condition</summary>
     /// <param name="predicate">Filter condition</param>
-    IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate);
-
-    /// <summary>Find all trackable entities matching condition</summary>
-    /// <param name="predicate">Filter condition</param>
-    IEnumerable<TEntity> TrackedFindAll(Expression<Func<TEntity, bool>> predicate);
+    Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>Find all entities matching condition</summary>
     /// <param name="predicate">Filter condition</param>
     /// <param name="includes">Related data to include</param>
-    IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate, string[] includes);
-
-    /// <summary>Find all trackable entities matching condition</summary>
-    /// <param name="predicate">Filter condition</param>
-    /// <param name="includes">Related data to include</param>
-    IEnumerable<TEntity> TrackedFindAll(Expression<Func<TEntity, bool>> predicate, string[] includes);
-
-    /// <summary>Find all trackable entities matching condition</summary>
-    /// <param name="predicate">Filter condition</param>
-    /// <param name="includes">Related data to include</param>
-    Task<IEnumerable<TEntity>> TrackedFindAllAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
-
-    /// <summary>Find entities with ordering and pagination</summary>
-    /// <param name="predicate">Filter condition</param>
-    /// <param name="take">Number to take</param>
-    /// <param name="skip">Number to skip</param>
-    /// <param name="orderBy">Order by expression</param>
-    /// <param name="orderByType">Sort direction</param>
-    IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate, int? take = null, int? skip = null, Expression<Func<TEntity, object>>? orderBy = null, string orderByType = OrderBy.Ascending);
+    Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
 
     /// <summary>Find entities with ordering and pagination</summary>
     /// <param name="predicate">Filter condition</param>
@@ -115,13 +47,29 @@ public interface IGenericRepository<TEntity, TKey> : IBasicRepository<TEntity>
 
     #endregion
 
+    #region Tracked Find
+
+    /// <summary>Find first trackable entity matching condition</summary>
+    /// <param name="predicate">Filter condition</param>
+    Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
+
+    /// <summary>Find first trackable entity matching condition</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
+    Task<TEntity?> TrackedFindAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
+
+    /// <summary>Find all trackable entities matching condition</summary>
+    /// <param name="predicate">Filter condition</param>
+    Task<IEnumerable<TEntity>> TrackedFindAllAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
+
+    /// <summary>Find all trackable entities matching condition</summary>
+    /// <param name="predicate">Filter condition</param>
+    /// <param name="includes">Related data to include</param>
+    Task<IEnumerable<TEntity>> TrackedFindAllAsync(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default);
+
+    #endregion
+
     #region Projection
-
-    #region Get
-
-    /// <summary>Get all entities converted to DTO</summary>
-    /// <typeparam name="TProjection">The type of the projection</typeparam>
-    IEnumerable<TProjection> GetAllProjection<TProjection>() where TProjection : class;
 
     /// <summary>Get all entities converted to DTO</summary>
     /// <typeparam name="TProjection">The type of the projection</typeparam>
@@ -130,17 +78,7 @@ public interface IGenericRepository<TEntity, TKey> : IBasicRepository<TEntity>
     /// <summary>Get all entities converted to DTO</summary>
     /// <typeparam name="TProjection">The type of the projection</typeparam>
     /// <param name="includes">Related data to include</param>
-    IEnumerable<TProjection> GetAllProjection<TProjection>(string[] includes) where TProjection : class;
-
-    /// <summary>Get all entities converted to DTO</summary>
-    /// <typeparam name="TProjection">The type of the projection</typeparam>
-    /// <param name="includes">Related data to include</param>
     Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(string[] includes, CancellationToken cancellationToken = default) where TProjection : class;
-
-    /// <summary>Get all entities with custom projection</summary>
-    /// <param name="selector">Custom projection expression</param>
-    /// <param name="distinct">Apply distinct to results</param>
-    IEnumerable<TProjection> GetAllProjection<TProjection>(Expression<Func<TEntity, TProjection>> selector, bool distinct);
 
     /// <summary>Get all entities with custom projection</summary>
     /// <param name="selector">Custom projection expression</param>
@@ -151,21 +89,7 @@ public interface IGenericRepository<TEntity, TKey> : IBasicRepository<TEntity>
     /// <param name="selector">Custom projection expression</param>
     /// <param name="distinct">Apply distinct to results</param>
     /// <param name="includes">Related data to include</param>
-    IEnumerable<TProjection> GetAllProjection<TProjection>(string[] includes, Expression<Func<TEntity, TProjection>> selector, bool distinct);
-
-    /// <summary>Get all entities with custom projection</summary>
-    /// <param name="selector">Custom projection expression</param>
-    /// <param name="distinct">Apply distinct to results</param>
-    /// <param name="includes">Related data to include</param>
     Task<IEnumerable<TProjection>> GetAllProjectionAsync<TProjection>(string[] includes, Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default);
-
-    #endregion
-
-    #region Find
-
-    /// <summary>Find all entities with your DTO</summary>
-    /// <param name="predicate">Filter condition</param>
-    IEnumerable<TProjection> FindAllProjection<TProjection>(Expression<Func<TEntity, bool>> predicate) where TProjection : class;
 
     /// <summary>Find all entities with your DTO</summary>
     /// <param name="predicate">Filter condition</param>
@@ -174,19 +98,8 @@ public interface IGenericRepository<TEntity, TKey> : IBasicRepository<TEntity>
 
     /// <summary>Find all entities converted to DTO</summary>
     /// <param name="predicate">Filter condition</param>
-    /// <param name="includes">Related data to include</param>
-    IEnumerable<TProjection> FindAllProjection<TProjection>(Expression<Func<TEntity, bool>> predicate, string[] includes) where TProjection : class;
-
-    /// <summary>Find all entities converted to DTO</summary>
-    /// <param name="predicate">Filter condition</param>
     /// <param name="includes">Related data to include</param
     Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, string[] includes, CancellationToken cancellationToken = default) where TProjection : class;
-
-    /// <summary>Find all entities with custom projection</summary>
-    /// <param name="predicate">Filter condition</param>
-    /// <param name="selector">Custom projection expression</param>
-    /// <param name="distinct">Apply distinct to results</param>
-    IEnumerable<TProjection> FindAllProjection<TProjection>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TProjection>> selector, bool distinct);
 
     /// <summary>Find all entities with custom projection</summary>
     /// <param name="predicate">Filter condition</param>
@@ -200,16 +113,7 @@ public interface IGenericRepository<TEntity, TKey> : IBasicRepository<TEntity>
     /// <param name="includes">Related data to include</param>
     /// <param name="selector">Custom projection expression</param>
     /// <param name="distinct">Apply distinct to results</param>
-    IEnumerable<TProjection> FindAllProjection<TProjection>(Expression<Func<TEntity, bool>> predicate, string[] includes, Expression<Func<TEntity, TProjection>> selector, bool distinct);
-
-    /// <summary>Find all entities with custom projection</summary>
-    /// <param name="predicate">Filter condition</param>
-    /// <param name="includes">Related data to include</param>
-    /// <param name="selector">Custom projection expression</param>
-    /// <param name="distinct">Apply distinct to results</param>
     Task<IEnumerable<TProjection>> FindAllProjectionAsync<TProjection>(Expression<Func<TEntity, bool>> predicate, string[] includes, Expression<Func<TEntity, TProjection>> selector, bool distinct, CancellationToken cancellationToken = default);
-
-    #endregion
 
     #endregion
 
@@ -219,25 +123,38 @@ public interface IGenericRepository<TEntity, TKey> : IBasicRepository<TEntity>
 
     /// <summary>Create new entity</summary>
     /// <param name="entity">Entity to add</param>
-    TEntity Add(TEntity entity);
+    Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
     /// <summary>Create multiple entities</summary>
     /// <param name="entities">Entities to add</param>
-    IEnumerable<TEntity> AddRange(IEnumerable<TEntity> entities);
+    Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+
+    /// <summary>Delete entity</summary>
+    /// <param name="entity">Entity to delete</param>
+    void Delete(TEntity entity);
+
+    /// <summary>Delete multiple entities</summary>
+    /// <param name="entities">Entities to delete</param>
+    void DeleteRange(IEnumerable<TEntity> entities);
+
+    /// <summary>Execute delete command directly in the database for entities matching the predicate</summary>
+    /// <param name="predicate">Filter condition</param>
+    Task ExecuteDeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
+
+    /// <summary>Update entity</summary>
+    /// <param name="entity">Entity to update</param>
+    TEntity Update(TEntity entity);
+
+    /// <summary>Update multiple entities</summary>
+    /// <param name="entities">Entities to update</param>
+    IEnumerable<TEntity> UpdateRange(IEnumerable<TEntity> entities);
 
     #endregion
 
     #region Helpers
 
     /// <summary>Count all entities</summary>
-    int Count();
-
-    /// <summary>Count all entities</summary>
     Task<int> CountAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>Count entities matching condition</summary>
-    /// <param name="predicate">Filter condition</param>
-    int Count(Expression<Func<TEntity, bool>> predicate);
 
     /// <summary>Count entities matching condition</summary>
     /// <param name="predicate">Filter condition</param>
@@ -245,15 +162,7 @@ public interface IGenericRepository<TEntity, TKey> : IBasicRepository<TEntity>
 
     /// <summary>Check if any entities match condition</summary>
     /// <param name="predicate">Filter condition</param>
-    bool Any(Expression<Func<TEntity, bool>> predicate);
-
-    /// <summary>Check if entity exists by ID</summary>
-    /// <param name="id">Entity ID</param>
-    bool Exists(TKey id);
-
-    /// <summary>Check if entity exists by ID</summary>
-    /// <param name="id">Entity ID</param>
-    Task<bool> ExistsAsync(TKey id, CancellationToken cancellationToken = default);
+    Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>Attach entity to context for tracking</summary>
     /// <param name="entity">Entity to attach</param>

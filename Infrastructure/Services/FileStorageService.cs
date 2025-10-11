@@ -14,9 +14,9 @@ public class FileStorageService : IFileStorageService
         _imagesPath = _rootPath + _imagesFolder;
     }
 
-    public async Task<string> SaveAsync(IFormFile file, FileTypes fileType, string fileName, CancellationToken cancellationToken = default)
+    public async Task SaveAsync(IFormFile file, FileTypes type, string fileName, CancellationToken cancellationToken = default)
     {
-        string path = fileType switch
+        string path = type switch
         {
             FileTypes.Image => Path.Combine(_imagesPath, fileName),
             _ => throw new InvalidOperationException("Invalid file type."),
@@ -24,22 +24,28 @@ public class FileStorageService : IFileStorageService
 
         using var stream = File.Create(path);
         await file.CopyToAsync(stream, cancellationToken);
-
-        return GetRelativePath(path);
     }
 
     public async Task RemoveAsync(string relativePath, CancellationToken cancellationToken = default)
     {
-        if (!relativePath.StartsWith(_imagesFolder))
-            throw new InvalidOperationException("Invalid path.");
-
-        var path = _rootPath + relativePath;
+        var path = GetPath(relativePath);
 
         if (File.Exists(path))
             await Task.Run(() => File.Delete(path), cancellationToken);
     }
 
-    private string GetRelativePath(string fullPath)
-        => fullPath.Replace(_rootPath, "").Replace("\\", "/");
-}
+    public string GetRelativePath(string fileName, FileTypes type)
+        => type switch
+        {
+            FileTypes.Image => Path.Combine(_imagesFolder, fileName).Replace("\\", "/"),
+            _ => throw new InvalidOperationException("Invalid file type."),
+        };
 
+    private string GetPath(string relativePath)
+    {
+        if (!relativePath.StartsWith(_imagesFolder))
+            throw new InvalidOperationException("Invalid path.");
+
+        return Path.Combine(_rootPath, relativePath.TrimStart('/'));
+    }
+}

@@ -1,7 +1,7 @@
 ﻿namespace Domain.Repositories;
 
-public interface IGenericRepositoryWithPagination<TEntity, TKey> : IGenericRepository<TEntity, TKey>, IPaginatedRepository<TEntity>
+public interface IGenericRepositoryWithPagination<TEntity> 
+    : IGenericRepository<TEntity>, IPaginatedRepository<TEntity> 
     where TEntity : class
-    where TKey : notnull
 {
 }

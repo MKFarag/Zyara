@@ -2,6 +2,7 @@
 
 public interface IFileStorageService
 {
-    Task<string> SaveAsync(IFormFile file, FileTypes fileType, string fileName, CancellationToken cancellationToken = default);
+    Task SaveAsync(IFormFile file, FileTypes type, string fileName, CancellationToken cancellationToken = default);
     Task RemoveAsync(string relativePath, CancellationToken cancellationToken = default);
+    string GetRelativePath(string fileName, FileTypes type);
 }

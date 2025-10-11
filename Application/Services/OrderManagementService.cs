@@ -226,7 +226,7 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
         if (!Enum.TryParse<OrderStatus>(request.Status, true, out var status))
             return Result.Failure(OrderErrors.InvalidStatus);
 
-        if (await _unitOfWork.Orders.GetAsync(id, cancellationToken) is not { } order)
+        if (await _unitOfWork.Orders.GetAsync([id], cancellationToken) is not { } order)
             return Result.Failure(OrderErrors.NotFound);
 
         order.Status = status;

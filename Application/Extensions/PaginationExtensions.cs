@@ -13,8 +13,7 @@ internal static class PaginationExtensions
         else
             sortColumn = allowedSortColumns.First();
 
-        if (!(string.Equals(filters.SortDirection, OrderBy.Ascending, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(filters.SortDirection, OrderBy.Descending, StringComparison.OrdinalIgnoreCase)))
+        if (!OrderBy.IsValid(filters.SortDirection))
             sortDirection = OrderBy.Ascending;
         else
             sortDirection = filters.SortDirection!;

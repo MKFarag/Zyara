@@ -7,13 +7,13 @@ public sealed class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _context;
     private bool _disposed = false;
 
-    public IGenericRepository<Address, int> Addresses { get; private set; }
-    public IBasicRepository<Cart> Carts { get; private set; }
+    public IGenericRepository<Address> Addresses { get; private set; }
+    public IGenericRepository<Cart> Carts { get; private set; }
     public ICustomerRepository Customers { get; private set; }
-    public IGenericRepository<DeliveryMan, int> DeliveryMen { get; private set; }
-    public IGenericRepositoryWithPagination<Order, int> Orders { get; private set; }
-    public IGenericRepository<OrderItem, int> OrderItems { get; private set; }
-    public IGenericRepositoryWithPagination<Product, int> Products { get; private set; }
+    public IGenericRepository<DeliveryMan> DeliveryMen { get; private set; }
+    public IGenericRepositoryWithPagination<Order> Orders { get; private set; }
+    public IGenericRepository<OrderItem> OrderItems { get; private set; }
+    public IGenericRepositoryWithPagination<Product> Products { get; private set; }
     public IRoleRepository Roles { get; private set; }
     public IUserRepository Users { get; private set; }
 
@@ -24,13 +24,13 @@ public sealed class UnitOfWork : IUnitOfWork
     {
         _context = context;
 
-        Addresses = new GenericRepository<Address, int>(_context);
-        Carts = new BasicRepository<Cart>(_context);
+        Addresses = new GenericRepository<Address>(_context);
+        Carts = new GenericRepository<Cart>(_context);
         Customers = new CustomerRepository(_context);
-        DeliveryMen = new GenericRepository<DeliveryMan, int>(_context);
-        Orders = new GenericRepositoryWithPagination<Order, int>(_context);
-        OrderItems = new GenericRepositoryWithPagination<OrderItem, int>(_context);
-        Products = new GenericRepositoryWithPagination<Product, int>(_context);
+        DeliveryMen = new GenericRepository<DeliveryMan>(_context);
+        Orders = new GenericRepositoryWithPagination<Order>(_context);
+        OrderItems = new GenericRepositoryWithPagination<OrderItem>(_context);
+        Products = new GenericRepositoryWithPagination<Product>(_context);
         Roles = new RoleRepository(_context, roleManager);
         Users = new UserRepository(_context, userManager);
     }

@@ -1,15 +1,9 @@
-﻿using System.Linq.Dynamic.Core;
+﻿namespace Infrastructure.Persistence.Repositories;
 
-namespace Infrastructure.Persistence.Repositories;
-
-public class GenericRepositoryWithPagination<TEntity, TKey>(ApplicationDbContext context) 
-    : GenericRepository<TEntity, TKey>(context), IGenericRepositoryWithPagination<TEntity, TKey>
-    where TEntity : class
-    where TKey : notnull
+public class GenericRepositoryWithPagination<TEntity>(ApplicationDbContext context) 
+    : GenericRepository<TEntity>(context), IGenericRepositoryWithPagination<TEntity> where TEntity : class
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
-    private const int _maxIncludeDepth = 2;
-    private const int _maxIncludeCount = 3;
 
     public async Task<IPaginatedList<TProjection>> GetPaginatedListAsync<TProjection>(
         int pageNumber, int pageSize, string? searchValue, string? searchColumn, string sortColumn, string sortDirection,
@@ -17,11 +11,11 @@ public class GenericRepositoryWithPagination<TEntity, TKey>(ApplicationDbContext
     {
         var query = _dbSet.AsNoTracking().AsQueryable();
 
-        query = ApplySearchFilter(query, searchValue, searchColumn, searchColumnType);
+        query = query
+            .ApplySearchFilter(searchValue, searchColumn, searchColumnType)
+            .OrderBy(sortColumn, sortDirection);
 
-        var finalQuery = query.OrderBy($"{sortColumn} {sortDirection}").ProjectToType<TProjection>();
-
-        return await PaginatedList<TProjection>.CreateAsync(finalQuery, pageNumber, pageSize, cancellationToken);
+        return await PaginatedList<TProjection>.CreateAsync(query.ProjectToType<TProjection>(), pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<IPaginatedList<TProjection>> GetPaginatedListAsync<TProjection>(
@@ -30,17 +24,12 @@ public class GenericRepositoryWithPagination<TEntity, TKey>(ApplicationDbContext
     {
         var query = _dbSet.AsNoTracking().AsQueryable();
 
-        query = ApplySearchFilter(query, searchValue, searchColumn, searchColumnType);
+        query = query
+            .ApplySearchFilter(searchValue, searchColumn, searchColumnType)
+            .ApplyIncludesSafely(includes)
+            .OrderBy(sortColumn, sortDirection);
 
-        foreach (var include in includes)
-            query = query.Include(include);
-
-        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
-            query = query.AsSplitQuery();
-
-        var finalQuery = query.OrderBy($"{sortColumn} {sortDirection}").ProjectToType<TProjection>();
-
-        return await PaginatedList<TProjection>.CreateAsync(finalQuery, pageNumber, pageSize, cancellationToken);
+        return await PaginatedList<TProjection>.CreateAsync(query.ProjectToType<TProjection>(), pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<IPaginatedList<TProjection>> FindPaginatedListAsync<TProjection>(
@@ -49,12 +38,12 @@ public class GenericRepositoryWithPagination<TEntity, TKey>(ApplicationDbContext
         ColumnType searchColumnType, CancellationToken cancellationToken = default) where TProjection : class
     {
         var query = _dbSet.AsNoTracking().Where(predicate).AsQueryable();
+        
+        query = query
+            .ApplySearchFilter(searchValue, searchColumn, searchColumnType)
+            .OrderBy(sortColumn, sortDirection);
 
-        query = ApplySearchFilter(query, searchValue, searchColumn, searchColumnType);
-
-        var finalQuery = query.OrderBy($"{sortColumn} {sortDirection}").ProjectToType<TProjection>();
-
-        return await PaginatedList<TProjection>.CreateAsync(finalQuery, pageNumber, pageSize, cancellationToken);
+        return await PaginatedList<TProjection>.CreateAsync(query.ProjectToType<TProjection>(), pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<IPaginatedList<TProjection>> FindPaginatedListAsync<TProjection>(
@@ -64,46 +53,11 @@ public class GenericRepositoryWithPagination<TEntity, TKey>(ApplicationDbContext
     {
         var query = _dbSet.AsNoTracking().Where(predicate).AsQueryable();
 
-        query = ApplySearchFilter(query, searchValue, searchColumn, searchColumnType);
+        query = query
+            .ApplySearchFilter(searchValue, searchColumn, searchColumnType)
+            .ApplyIncludesSafely(includes)
+            .OrderBy(sortColumn, sortDirection);
 
-        foreach (var include in includes)
-            query = query.Include(include);
-
-        if (includes.Any(x => x.Count(c => c == '.') >= _maxIncludeDepth) || includes.Length >= _maxIncludeCount)
-            query = query.AsSplitQuery();
-
-        var finalQuery = query.OrderBy($"{sortColumn} {sortDirection}").ProjectToType<TProjection>();
-
-        return await PaginatedList<TProjection>.CreateAsync(finalQuery, pageNumber, pageSize, cancellationToken);
-    }
-
-    private static IQueryable<T> ApplySearchFilter<T>(IQueryable<T> query, string? searchValue, string? searchColumn, ColumnType searchColumnType)
-    {
-        if (string.IsNullOrEmpty(searchValue) || string.IsNullOrEmpty(searchColumn))
-            return query;
-
-        switch (searchColumnType)
-        {
-            case ColumnType.String:
-                query = query.Where($"{searchColumn}.Contains(@0)", searchValue);
-                break;
-
-            case ColumnType.Int:
-                if (int.TryParse(searchValue, out var intValue))
-                    query = query.Where($"{searchColumn} == @0", intValue);
-                break;
-
-            case ColumnType.Bool:
-                if (bool.TryParse(searchValue, out var boolValue))
-                    query = query.Where($"{searchColumn} == @0", boolValue);
-                break;
-
-            case ColumnType.Date:
-                if (DateTime.TryParse(searchValue, out var dateValue))
-                    query = query.Where($"{searchColumn}.Date == @0", dateValue.Date);
-                break;
-        }
-
-        return query;
+        return await PaginatedList<TProjection>.CreateAsync(query.ProjectToType<TProjection>(), pageNumber, pageSize, cancellationToken);
     }
 }
