@@ -4,16 +4,19 @@ namespace Presentation.Controllers;
 
 [Route("api/admin/orders")]
 [ApiController]
-//[Authorize]
+[Authorize]
+[EnableRateLimiting(RateLimitingOptions.PolicyNames.Fixed)]
 public class AdminOrdersController(IOrderManagementService orderManagementService) : ControllerBase
 {
     private readonly IOrderManagementService _orderManagementService = orderManagementService;
 
     [HttpGet("")]
+    [HasPermission(Permissions.GetOrders)]
     public async Task<IActionResult> GetAll([FromQuery] RequestFilters filters, [FromBody] OrderStatusRequest request, CancellationToken cancellationToken)
         => Ok(await _orderManagementService.GetAllByStatusAsync(filters, request, cancellationToken));
 
     [HttpGet("{id}")]
+    [HasPermission(Permissions.GetOrders)]
     public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
     {
         var result = await _orderManagementService.GetAsync(id, cancellationToken);
@@ -24,14 +27,17 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
     }
 
     [HttpGet("current-history")]
+    [HasPermission(Permissions.GetOrders)]
     public async Task<IActionResult> GetCurrentHistory([FromQuery] RequestFilters filters, CancellationToken cancellationToken)
         => Ok(await _orderManagementService.GetCurrentHistoryAsync(filters, cancellationToken));
 
     [HttpGet("date-history")]
+    [HasPermission(Permissions.GetOrders)]
     public async Task<IActionResult> GetHistoryByDate([FromBody] OrderDateRequest request, [FromQuery] RequestFilters filters, CancellationToken cancellationToken)
         => Ok(await _orderManagementService.GetHistoryByDateAsync(filters, request.Date, cancellationToken));
 
     [HttpGet("month-history")]
+    [HasPermission(Permissions.GetOrders)]
     public async Task<IActionResult> GetHistoryByMonth([FromQuery] int month, [FromQuery] RequestFilters filters, CancellationToken cancellationToken)
     {
         if (month is < 1 or > 12)
@@ -41,6 +47,7 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
     }
 
     [HttpGet("year-history")]
+    [HasPermission(Permissions.GetOrders)]
     public async Task<IActionResult> GetHistoryByYear([FromQuery] int year, [FromQuery] RequestFilters filters, CancellationToken cancellationToken)
     {
         if (year < 2025 || year > DateTime.UtcNow.Year)
@@ -50,6 +57,7 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
     }
 
     [HttpGet("current-earning")]
+    [HasPermission(Permissions.GetOrdersEarning)]
     public async Task<IActionResult> GetCurrentEarning(CancellationToken cancellationToken)
     {
         var result = await _orderManagementService.GetCurrentEarningAsync(cancellationToken);
@@ -60,6 +68,7 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
     }
 
     [HttpGet("date-earning")]
+    [HasPermission(Permissions.GetOrdersEarning)]
     public async Task<IActionResult> GetEarningByDate([FromBody] OrderDateRequest request, CancellationToken cancellationToken)
     {
         var result = await _orderManagementService.GetEarningByDateAsync(request.Date, cancellationToken);
@@ -70,6 +79,7 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
     }
 
     [HttpGet("month-earning")]
+    [HasPermission(Permissions.GetOrdersEarning)]
     public async Task<IActionResult> GetEarningByMonth([FromQuery] int month, CancellationToken cancellationToken)
     {
         if (month is < 1 or > 12)
@@ -83,6 +93,7 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
     }
 
     [HttpGet("year-earning")]
+    [HasPermission(Permissions.GetOrdersEarning)]
     public async Task<IActionResult> GetEarningByYear([FromQuery] int year, CancellationToken cancellationToken)
     {
         if (year < 2025 || year > DateTime.UtcNow.Year)
@@ -96,6 +107,7 @@ public class AdminOrdersController(IOrderManagementService orderManagementServic
     }
 
     [HttpPut("{id}/change-status")]
+    [HasPermission(Permissions.UpdateOrdersStatus)]
     public async Task<IActionResult> ChangeStatus([FromRoute] int id, [FromBody] OrderStatusRequest request, CancellationToken cancellationToken)
     {
         var result = await _orderManagementService.ChangeStatusAsync(id, request, cancellationToken);

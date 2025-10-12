@@ -4,7 +4,8 @@ namespace Presentation.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = DefaultRoles.Customer.Name)]
+[EnableRateLimiting(RateLimitingOptions.PolicyNames.UserLimit)]
 public class CartsController(ICartService cartService) : ControllerBase
 {
     private readonly ICartService _cartService = cartService;

@@ -2,6 +2,7 @@
 
 using Application;
 using Application.Services;
+using Domain.Settings;
 using Hangfire;
 using Infrastructure;
 using Infrastructure.Authentication;
@@ -10,10 +11,13 @@ using Infrastructure.Persistence.Identities;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Abstraction;
 using Presentation.OpenApiTransformers;
 using System.Text;
+using System.Threading.RateLimiting;
 
 #endregion
 
@@ -32,6 +36,7 @@ public static class DependencyInjection
         services.AddHangfireConfig(configuration);
         services.AddHttpContextAccessor();
         services.AddCORSConfig(configuration);
+        services.AddRateLimiterConfig();
 
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<ICustomerService, CustomerService>();
@@ -170,6 +175,71 @@ public static class DependencyInjection
                     .AllowAnyHeader()
                     .WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!);
             });
+        });
+
+        return services;
+    }
+
+    #endregion
+
+    #region RateLimiter
+
+    private static IServiceCollection AddRateLimiterConfig(this IServiceCollection services)
+    {
+        services.AddOptions<RateLimitingOptions>()
+            .BindConfiguration(nameof(RateLimitingOptions))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        var provider = services.BuildServiceProvider();
+        var settings = provider.GetRequiredService<IOptions<RateLimitingOptions>>().Value;
+
+        services.AddRateLimiter(rateLimiterOptions =>
+        {
+            rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            #region IpLimit
+
+            rateLimiterOptions.AddPolicy(RateLimitingOptions.PolicyNames.IpLimit, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = settings.IpPolicy.PermitLimit,
+                        Window = TimeSpan.FromSeconds(settings.IpPolicy.WindowInSeconds)
+                    }
+                )
+            );
+
+            #endregion
+
+            #region UserLimit
+
+            rateLimiterOptions.AddPolicy(RateLimitingOptions.PolicyNames.UserLimit, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.GetId(),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = settings.UserPolicy.PermitLimit,
+                        Window = TimeSpan.FromSeconds(settings.UserPolicy.WindowInSeconds)
+                    }
+                )
+            );
+
+            #endregion
+
+            #region FixedWindow
+
+            rateLimiterOptions.AddFixedWindowLimiter(RateLimitingOptions.PolicyNames.Fixed, options =>
+            {
+                options.QueueLimit = settings.FixedWindow.QueueLimit;
+                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+
+                options.PermitLimit = settings.FixedWindow.PermitLimit;
+                options.Window = TimeSpan.FromSeconds(settings.FixedWindow.WindowInSeconds);
+            });
+
+            #endregion
         });
 
         return services;

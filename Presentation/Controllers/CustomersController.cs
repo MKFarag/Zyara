@@ -5,7 +5,8 @@ namespace Presentation.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = DefaultRoles.Customer.Name)]
+[EnableRateLimiting(RateLimitingOptions.PolicyNames.UserLimit)]
 public class CustomersController(ICustomerService customerService) : ControllerBase
 {
     private readonly ICustomerService _customerService = customerService;

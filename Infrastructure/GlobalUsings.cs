@@ -18,3 +18,4 @@ global using Infrastructure.Extensions;
 global using Domain.Settings;
 global using Microsoft.Extensions.Logging;
 global using Infrastructure.Persistence.Common;
+global using Microsoft.AspNetCore.Authorization;

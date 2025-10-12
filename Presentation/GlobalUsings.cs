@@ -6,3 +6,7 @@ global using Application.Interfaces.Application;
 global using Application.Contracts.Common;
 global using Microsoft.AspNetCore.Authorization;
 global using FluentValidation;
+global using Infrastructure.Authentication.Filters;
+global using Domain.Settings;
+global using Microsoft.AspNetCore.RateLimiting;
+global using Domain.Constants;

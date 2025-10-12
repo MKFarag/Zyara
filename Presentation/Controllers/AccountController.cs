@@ -4,7 +4,8 @@ namespace Presentation.Controllers;
 
 [Route("me")]
 [ApiController]
-//[Authorize]
+[Authorize]
+[EnableRateLimiting(RateLimitingOptions.PolicyNames.UserLimit)]
 public class AccountController(IUserService userService) : ControllerBase
 {
     private readonly IUserService _userService = userService;

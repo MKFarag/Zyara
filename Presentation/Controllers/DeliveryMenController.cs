@@ -4,15 +4,19 @@ namespace Presentation.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
+[EnableRateLimiting(RateLimitingOptions.PolicyNames.Fixed)]
 public class DeliveryMenController(IDeliveryManService deliveryManService) : ControllerBase
 {
     private readonly IDeliveryManService _deliveryManService = deliveryManService;
 
     [HttpGet("")]
+    [HasPermission(Permissions.GetDeliveryMen)]
     public async Task<IActionResult> GetAll([FromQuery] bool includeDisabled, CancellationToken cancellationToken)
         => Ok(await _deliveryManService.GetAllAsync(includeDisabled, cancellationToken));
 
     [HttpGet("{id}")]
+    [HasPermission(Permissions.GetDeliveryMen)]
     public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
     {
         var result = await _deliveryManService.GetAsync(id, cancellationToken);
@@ -23,6 +27,7 @@ public class DeliveryMenController(IDeliveryManService deliveryManService) : Con
     }
 
     [HttpGet("{id}/orders")]
+    [HasPermission(Permissions.GetDeliveryMenOrders)]
     public async Task<IActionResult> GetOrders([FromRoute] int id, CancellationToken cancellationToken)
     {
         var result = await _deliveryManService.GetOrdersAsync(id, cancellationToken);
@@ -33,6 +38,7 @@ public class DeliveryMenController(IDeliveryManService deliveryManService) : Con
     }
 
     [HttpPost("")]
+    [HasPermission(Permissions.AddDeliveryMen)]
     public async Task<IActionResult> Add([FromBody] DeliveryManRequest request, CancellationToken cancellationToken)
     {
         var result = await _deliveryManService.AddAsync(request, cancellationToken);
@@ -43,6 +49,7 @@ public class DeliveryMenController(IDeliveryManService deliveryManService) : Con
     }
 
     [HttpPut("{id}")]
+    [HasPermission(Permissions.UpdateDeliveryMen)]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] DeliveryManRequest request, CancellationToken cancellationToken)
     {
         var result = await _deliveryManService.UpdateAsync(id, request, cancellationToken);
@@ -53,6 +60,7 @@ public class DeliveryMenController(IDeliveryManService deliveryManService) : Con
     }
 
     [HttpPut("{deliveryManId}/set-order/{orderId}")]
+    [HasPermission(Permissions.SetDeliveryMenOrders)]
     public async Task<IActionResult> SetToOrder([FromRoute] int deliveryManId, [FromRoute] int orderId, CancellationToken cancellationToken)
     {
         var result = await _deliveryManService.SetToOrderAsync(deliveryManId, orderId, cancellationToken);
@@ -63,6 +71,7 @@ public class DeliveryMenController(IDeliveryManService deliveryManService) : Con
     }
 
     [HttpPut("{id}/toggle-status")]
+    [HasPermission(Permissions.UpdateDeliveryMenStatus)]
     public async Task<IActionResult> ToggleStatus([FromRoute] int id, CancellationToken cancellationToken)
     {
         var result = await _deliveryManService.ToggleStatusAsync(id, cancellationToken);

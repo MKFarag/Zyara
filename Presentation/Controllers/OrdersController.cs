@@ -2,7 +2,8 @@
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = DefaultRoles.Customer.Name)]
+[EnableRateLimiting(RateLimitingOptions.PolicyNames.UserLimit)]
 public class OrdersController(IOrderService orderService) : ControllerBase
 {
     private readonly IOrderService _orderService = orderService;

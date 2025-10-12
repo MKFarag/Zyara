@@ -4,6 +4,7 @@ namespace Presentation.Controllers;
 
 [Route("[controller]")]
 [ApiController]
+[EnableRateLimiting(RateLimitingOptions.PolicyNames.IpLimit)]
 public class AuthController(IAuthService authService) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
