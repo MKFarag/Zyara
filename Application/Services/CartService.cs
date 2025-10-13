@@ -31,6 +31,16 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         return Result.Success(response);
     }
 
+    public async Task<Result<int>> CountAsync(string customerId, CancellationToken cancellationToken = default)
+    {
+        if (!await _unitOfWork.Customers.AnyAsync(c => c.Id == customerId, cancellationToken))
+            return Result.Failure<int>(CustomerErrors.NotFound);
+
+        var count = await _unitOfWork.Carts.CountAsync(c => c.CustomerId == customerId, cancellationToken);
+
+        return Result.Success(count);
+    }
+
     public async Task<Result> AddAsync(string customerId, int productId, int quantity, CancellationToken cancellationToken = default)
     {
         if (!await _unitOfWork.Customers.AnyAsync(c => c.Id == customerId, cancellationToken))

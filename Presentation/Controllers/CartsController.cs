@@ -20,6 +20,16 @@ public class CartsController(ICartService cartService) : ControllerBase
             : result.ToProblem();
     }
 
+    [HttpGet("count")]
+    public async Task<IActionResult> GetCount(CancellationToken cancellationToken)
+    {
+        var result = await _cartService.CountAsync(User.GetId()!, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : result.ToProblem();
+    }
+
     [HttpPost("{productId}")]
     public async Task<IActionResult> Add([FromRoute] int productId, [FromBody] CartQuantityRequest request, CancellationToken cancellationToken)
     {

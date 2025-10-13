@@ -22,6 +22,24 @@ public class AdminProductsController(IProductService productService) : Controlle
             : result.ToProblem();
     }
 
+    [HttpPost("images")]
+    [HasPermission(Permissions.AddProducts)]
+    public async Task<IActionResult> Add(
+        [FromBody] ProductRequest productRequest, [FromForm] UploadImagesRequest imagesRequest, 
+        [FromServices] IValidator<UploadImagesRequest> validator, CancellationToken cancellationToken)
+    {
+        var validationResult = await validator.ValidateAsync(imagesRequest, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return this.ToProblem(validationResult);
+
+        var result = await _productService.AddAsync(productRequest, imagesRequest.Images, cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(ProductsController.Get), new { result.Value.Id }, result.Value)
+            : result.ToProblem();
+    }
+
     [HttpPost("{id}/images")]
     [HasPermission(Permissions.UpdateProducts)]
     public async Task<IActionResult> AddImages([FromRoute] int id, [FromForm] UploadImagesRequest request, [FromServices] IValidator<UploadImagesRequest> validator, CancellationToken cancellationToken)

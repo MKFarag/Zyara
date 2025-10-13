@@ -1,4 +1,7 @@
-﻿namespace Application.Services;
+﻿using Domain.Entities;
+using System.Threading;
+
+namespace Application.Services;
 
 public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStorageService) : IProductService
 {
@@ -71,6 +74,22 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         return Result.Success(product.Adapt<ProductResponse>());
     }
 
+    public async Task<Result<ProductResponse>> AddAsync(ProductRequest request, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default)
+    {
+        if (await _unitOfWork.Products.AnyAsync(p => p.Name == request.Name, cancellationToken))
+            return Result.Failure<ProductResponse>(ProductErrors.DuplicatedName);
+
+        var product = request.Adapt<Product>();
+
+        await _unitOfWork.Products.AddAsync(product, cancellationToken);
+
+        await _unitOfWork.CompleteAsync(cancellationToken);
+
+        await SaveImagesAsync(product, images, cancellationToken);
+
+        return Result.Success(product.Adapt<ProductResponse>());
+    }
+
     public async Task<Result> AddImagesAsync(int id, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default)
     {
         var product = await _unitOfWork.Products.TrackedFindAsync
@@ -83,21 +102,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         if (product is null)
             return Result.Failure(ProductErrors.NotFound);
 
-        foreach (var image in images)
-        {
-            var imageName = GetName(image);
-
-            await _fileStorageService.SaveAsync(image, FileTypes.Image, imageName, cancellationToken);
-
-            product.Images.Add(new ProductImage
-            {
-                Url = _fileStorageService.GetRelativePath(imageName, FileTypes.Image),
-                IsMain = false
-            });
-        }
-
-        if (!product.Images.Any(pi => pi.IsMain))
-            product.Images.First().IsMain = true;
+        await SaveImagesAsync(product, images, cancellationToken);
 
         await _unitOfWork.CompleteAsync(cancellationToken);
 
@@ -229,6 +234,25 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         await _unitOfWork.CompleteAsync(cancellationToken);
 
         return Result.Success();
+    }
+
+    private async Task SaveImagesAsync(Product product, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default)
+    {
+        foreach (var image in images)
+        {
+            var imageName = GetName(image);
+
+            await _fileStorageService.SaveAsync(image, FileTypes.Image, imageName, cancellationToken);
+
+            product.Images.Add(new ProductImage
+            {
+                Url = _fileStorageService.GetRelativePath(imageName, FileTypes.Image),
+                IsMain = false
+            });
+        }
+
+        if (!product.Images.Any(pi => pi.IsMain))
+            product.Images.First().IsMain = true;
     }
 
     private static string GetName(IFormFile image)
