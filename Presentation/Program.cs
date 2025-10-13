@@ -1,10 +1,12 @@
 #region Usings
 
-using Presentation;
-using Serilog;
-using Scalar.AspNetCore;
 using Hangfire;
 using HangfireBasicAuthenticationFilter;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Presentation;
+using Scalar.AspNetCore;
+using Serilog;
 
 #endregion
 
@@ -50,6 +52,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseExceptionHandler();
+
+app.MapHealthChecks("health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.MapStaticAssets();
 

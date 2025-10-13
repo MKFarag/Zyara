@@ -6,12 +6,14 @@ using Domain.Settings;
 using Hangfire;
 using Infrastructure;
 using Infrastructure.Authentication;
+using Infrastructure.Health;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Identities;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Abstraction;
@@ -37,6 +39,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddCORSConfig(configuration);
         services.AddRateLimiterConfig();
+        services.AddHealthCheckConfig(configuration);
 
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<ICustomerService, CustomerService>();
@@ -244,6 +247,20 @@ public static class DependencyInjection
 
         return services;
     }
+
+    #endregion
+
+    #region HealthCheck
+
+    private static IServiceCollection AddHealthCheckConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHealthChecks()
+            .AddSqlServer(name: "Database", connectionString: configuration.GetConnectionString("DefaultConnection")!)
+            .AddHangfire(options => { options.MinimumAvailableServers = 1; })
+            .AddCheck<MailProviderHealthCheck>(name: "Mail service");
+
+        return services;
+    } 
 
     #endregion
 }
