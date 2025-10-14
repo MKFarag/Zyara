@@ -12,7 +12,13 @@ public class AccountController(IUserService userService) : ControllerBase
 
     [HttpGet("")]
     public async Task<IActionResult> Info(CancellationToken cancellationToken)
-        => Ok(await _userService.GetProfileAsync(User.GetId()!, cancellationToken));
+    {
+        var result = await _userService.GetProfileAsync(User.GetId()!, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : result.ToProblem();
+    }
 
     [HttpPut("")]
     public async Task<IActionResult> Info([FromBody] UpdateProfileRequest request, CancellationToken cancellationToken)

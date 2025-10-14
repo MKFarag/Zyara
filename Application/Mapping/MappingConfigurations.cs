@@ -9,8 +9,14 @@ public class MappingConfigurations : IRegister
         config.NewConfig<ProductRequest, Product>()
             .Map(dest => dest.CurrentPrice, src => src.SellingPrice);
 
+        config.NewConfig<ProductWithImagesRequest, Product>()
+            .Map(dest => dest.CurrentPrice, src => src.SellingPrice);
+
         config.NewConfig<Product, ProductResponse>()
-            .Map(dest => dest.MainImageUrl, src => src.Images.First(pi => pi.IsMain).Url);
+            .Map(dest => dest.MainImageUrl, 
+            src => src.Images.Count != 0
+                ? src.Images.First(pi => pi.IsMain).Url
+                : string.Empty);
 
         config.NewConfig<Order, OrderResponse>()
             .Map(dest => dest.OrderDate, src => DateOnly.FromDateTime(src.OrderDate))

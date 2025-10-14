@@ -96,7 +96,7 @@ public class UserService(IUnitOfWork unitOfWork, IEmailTemplateService emailTemp
         if (string.Equals(user.UserName, newUserName, StringComparison.OrdinalIgnoreCase))
             return Result.Failure(UserErrors.SameUserName);
 
-        if (await _unitOfWork.Users.IsChangeUserNameAvailable(user))
+        if (!await _unitOfWork.Users.IsChangeUserNameAvailable(user))
             return Result.Failure(UserErrors.UserNameChangeNotAllowed);
 
         var changeUserNameResult = await _unitOfWork.Users.ChangeUserNameAsync(user, newUserName, _minDaysBetweenChanges);

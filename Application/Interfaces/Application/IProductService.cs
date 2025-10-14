@@ -5,7 +5,7 @@ public interface IProductService
     Task<IPaginatedList<ProductResponse>> GetAllAsync(RequestFilters filters, bool includeNotAvailable, CancellationToken cancellationToken = default);
     Task<Result<ProductDetailsResponse>> GetAsync(int id, CancellationToken cancellationToken = default);
     Task<Result<ProductResponse>> AddAsync(ProductRequest request, CancellationToken cancellationToken = default);
-    Task<Result<ProductResponse>> AddAsync(ProductRequest request, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default);
+    Task<Result<ProductResponse>> AddAsync(ProductWithImagesRequest request, CancellationToken cancellationToken = default);
     Task<Result> AddImagesAsync(int id, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default);
     Task<Result> SetMainImageAsync(int productId, int imageId, CancellationToken cancellationToken = default);
     Task<Result> DeleteImageAsync(int productId, int imageId, CancellationToken cancellationToken = default);

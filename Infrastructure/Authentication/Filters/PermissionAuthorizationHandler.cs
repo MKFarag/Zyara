@@ -2,14 +2,14 @@
 
 public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
     {
         if (context.User.Identity is not { IsAuthenticated: true } ||
             !context.User.Claims.Any(x => x.Value == requirement.Permission && x.Type == Permissions.Type))
-            return Task.CompletedTask;
+            return;
 
         context.Succeed(requirement);
-        return Task.CompletedTask;
+        return;
     }
 }
 

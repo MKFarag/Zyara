@@ -4,5 +4,6 @@ public record CartProductResponse(
     int Id,
     string Name,
     decimal CurrentPrice,
-    int Quantity
+    int Quantity,
+    string MainImageUrl
 );

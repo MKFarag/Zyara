@@ -74,7 +74,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
         return Result.Success(product.Adapt<ProductResponse>());
     }
 
-    public async Task<Result<ProductResponse>> AddAsync(ProductRequest request, IEnumerable<IFormFile> images, CancellationToken cancellationToken = default)
+    public async Task<Result<ProductResponse>> AddAsync(ProductWithImagesRequest request, CancellationToken cancellationToken = default)
     {
         if (await _unitOfWork.Products.AnyAsync(p => p.Name == request.Name, cancellationToken))
             return Result.Failure<ProductResponse>(ProductErrors.DuplicatedName);
@@ -83,9 +83,11 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
 
         await _unitOfWork.Products.AddAsync(product, cancellationToken);
 
-        await _unitOfWork.CompleteAsync(cancellationToken);
+        product.Images = [];
 
-        await SaveImagesAsync(product, images, cancellationToken);
+        await SaveImagesAsync(product, request.Images, cancellationToken);
+
+        await _unitOfWork.CompleteAsync(cancellationToken);
 
         return Result.Success(product.Adapt<ProductResponse>());
     }

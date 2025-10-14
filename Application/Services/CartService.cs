@@ -10,7 +10,7 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
             return Result.Failure<CartResponse>(CustomerErrors.NotFound);
 
         var cart = await _unitOfWork.Carts
-            .FindAllAsync(c => c.CustomerId == customerId, [nameof(Cart.Product)], cancellationToken);
+            .FindAllAsync(c => c.CustomerId == customerId, [$"{nameof(Cart.Product)}.{nameof(Product.Images)}"], cancellationToken);
 
         var totalPrice = cart.Sum(c => c.Product.CurrentPrice * c.Quantity);
 
@@ -23,7 +23,8 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
                 c.ProductId,
                 c.Product.Name,
                 c.Product.CurrentPrice,
-                c.Quantity
+                c.Quantity,
+                c.Product.Images.Count != 0 ? c.Product.Images.First(pi => pi.IsMain).Url : string.Empty
             ))],
             totalPrice
         );

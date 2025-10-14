@@ -77,8 +77,8 @@ public static class DependencyInjection
 
         #region Roles
 
-        //services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        //services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
+        services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
         #endregion
 

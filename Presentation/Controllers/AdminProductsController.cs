@@ -1,5 +1,6 @@
 ﻿using Application.Contracts.Files;
 using Application.Contracts.Product;
+using Domain.Entities;
 
 namespace Presentation.Controllers;
 
@@ -18,25 +19,23 @@ public class AdminProductsController(IProductService productService) : Controlle
         var result = await _productService.AddAsync(request, cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(ProductsController.Get), new { result.Value.Id }, result.Value)
+            ? CreatedAtAction(nameof(ProductsController.Get), "Products", new { result.Value.Id }, result.Value)
             : result.ToProblem();
     }
 
     [HttpPost("images")]
     [HasPermission(Permissions.AddProducts)]
-    public async Task<IActionResult> Add(
-        [FromBody] ProductRequest productRequest, [FromForm] UploadImagesRequest imagesRequest, 
-        [FromServices] IValidator<UploadImagesRequest> validator, CancellationToken cancellationToken)
+    public async Task<IActionResult> Add([FromForm] ProductWithImagesRequest request, [FromServices] IValidator<ProductWithImagesRequest> validator, CancellationToken cancellationToken)
     {
-        var validationResult = await validator.ValidateAsync(imagesRequest, cancellationToken);
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
             return this.ToProblem(validationResult);
 
-        var result = await _productService.AddAsync(productRequest, imagesRequest.Images, cancellationToken);
+        var result = await _productService.AddAsync(request, cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(ProductsController.Get), new { result.Value.Id }, result.Value)
+            ? CreatedAtAction(nameof(ProductsController.Get), "Products", new { result.Value.Id }, result.Value)
             : result.ToProblem();
     }
 
