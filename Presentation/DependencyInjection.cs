@@ -2,7 +2,6 @@
 
 using Application;
 using Application.Services;
-using Domain.Settings;
 using Hangfire;
 using Infrastructure;
 using Infrastructure.Authentication;
@@ -12,8 +11,6 @@ using Infrastructure.Persistence.Identities;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Abstraction;
@@ -260,7 +257,7 @@ public static class DependencyInjection
             .AddCheck<MailProviderHealthCheck>(name: "Mail service");
 
         return services;
-    } 
+    }
 
     #endregion
 }

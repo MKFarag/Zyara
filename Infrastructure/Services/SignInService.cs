@@ -4,7 +4,7 @@ public class SignInService(SignInManager<ApplicationUser> signInManager, UserMan
 {
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
-    
+
     public async Task<Result<User>> PasswordSignInAsync(string identifier, string password, bool isPersistent, bool lockoutOnFailure)
     {
         if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(password))

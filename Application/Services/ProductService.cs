@@ -1,7 +1,4 @@
-﻿using Domain.Entities;
-using System.Threading;
-
-namespace Application.Services;
+﻿namespace Application.Services;
 
 public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStorageService) : IProductService
 {
@@ -9,7 +6,7 @@ public class ProductService(IUnitOfWork unitOfWork, IFileStorageService fileStor
     private readonly IFileStorageService _fileStorageService = fileStorageService;
 
     private static readonly string _allowedSearchColumn = nameof(Product.Name);
-    private static readonly HashSet<string> _allowedSortColumns = new(StringComparer.OrdinalIgnoreCase) 
+    private static readonly HashSet<string> _allowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
     { nameof(Product.Id), nameof(Product.CurrentPrice) };
 
     public async Task<IPaginatedList<ProductResponse>> GetAllAsync(RequestFilters filters, bool includeNotAvailable, CancellationToken cancellationToken = default)

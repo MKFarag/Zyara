@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-
-namespace Application.Mapping;
+﻿namespace Application.Mapping;
 
 public class MappingConfigurations : IRegister
 {
@@ -13,7 +11,7 @@ public class MappingConfigurations : IRegister
             .Map(dest => dest.CurrentPrice, src => src.SellingPrice);
 
         config.NewConfig<Product, ProductResponse>()
-            .Map(dest => dest.MainImageUrl, 
+            .Map(dest => dest.MainImageUrl,
             src => src.Images.Count != 0
                 ? src.Images.First(pi => pi.IsMain).Url
                 : string.Empty);

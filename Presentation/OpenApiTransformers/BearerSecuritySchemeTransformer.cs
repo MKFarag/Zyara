@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi.Models; 
+using Microsoft.OpenApi.Models;
 
 #endregion
 

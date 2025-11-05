@@ -18,9 +18,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
                 cancellationToken
             );
 
-        return orders.Adapt<IEnumerable<OrderResponse>>(); 
+        return orders.Adapt<IEnumerable<OrderResponse>>();
     }
-   
+
     public async Task<Result<OrderResponse>> GetAsync(string customerId, int orderId, CancellationToken cancellationToken = default)
     {
         var order = await _unitOfWork.Orders
@@ -39,7 +39,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
         var response = order.Adapt<OrderResponse>();
 
-        return Result.Success(response); 
+        return Result.Success(response);
     }
 
     public async Task<Result<OrderStatusResponse>> TrackAsync(string customerId, int orderId, CancellationToken cancellationToken = default)

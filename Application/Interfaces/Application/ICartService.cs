@@ -1,6 +1,4 @@
-﻿using Application.Contracts.Cart;
-
-namespace Application.Interfaces.Application;
+﻿namespace Application.Interfaces.Application;
 
 public interface ICartService
 {

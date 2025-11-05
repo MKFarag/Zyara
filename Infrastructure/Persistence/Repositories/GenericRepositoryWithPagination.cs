@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Persistence.Repositories;
 
-public class GenericRepositoryWithPagination<TEntity>(ApplicationDbContext context) 
+public class GenericRepositoryWithPagination<TEntity>(ApplicationDbContext context)
     : GenericRepository<TEntity>(context), IGenericRepositoryWithPagination<TEntity> where TEntity : class
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
@@ -38,7 +38,7 @@ public class GenericRepositoryWithPagination<TEntity>(ApplicationDbContext conte
         ColumnType searchColumnType, CancellationToken cancellationToken = default) where TProjection : class
     {
         var query = _dbSet.AsNoTracking().Where(predicate).AsQueryable();
-        
+
         query = query
             .ApplySearchFilter(searchValue, searchColumn, searchColumnType)
             .OrderBy(sortColumn, sortDirection);

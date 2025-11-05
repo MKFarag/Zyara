@@ -18,8 +18,8 @@ public static class Permissions
     #region Orders
 
     public const string GetOrders = "order:read-all";
-	public const string GetOrdersEarning = "order:read-earning";
-	public const string UpdateOrdersStatus = "order:update-status";
+    public const string GetOrdersEarning = "order:read-earning";
+    public const string UpdateOrdersStatus = "order:update-status";
 
     #endregion
 
@@ -54,5 +54,5 @@ public static class Permissions
     #endregion
 
     public static IList<string?> GetAll()
-		=> [.. typeof(Permissions).GetFields().Select(x => x.GetValue(x) as string)];
+        => [.. typeof(Permissions).GetFields().Select(x => x.GetValue(x) as string)];
 }

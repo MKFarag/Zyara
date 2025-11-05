@@ -1,7 +1,7 @@
 ﻿#region Usings
 
 using Application.Contracts.Customer.Address;
-using Application.Contracts.Customer.PhoneNumber; 
+using Application.Contracts.Customer.PhoneNumber;
 
 #endregion
 

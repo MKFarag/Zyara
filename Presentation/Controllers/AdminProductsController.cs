@@ -1,6 +1,5 @@
 ﻿using Application.Contracts.Files;
 using Application.Contracts.Product;
-using Domain.Entities;
 
 namespace Presentation.Controllers;
 

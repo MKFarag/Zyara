@@ -1,5 +1,4 @@
 ﻿using Domain.Abstraction;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Extensions;
 

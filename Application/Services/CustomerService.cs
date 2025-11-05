@@ -2,7 +2,6 @@
 
 using Application.Contracts.Customer.Address;
 using Application.Contracts.Customer.PhoneNumber;
-using System.Collections.Generic;
 
 #endregion
 
@@ -142,7 +141,7 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
             response = response.Append(new(phoneNumber.PhoneNumber, phoneNumber.IsPrimary));
 
         return Result.Success(response);
-    } 
+    }
 
     public async Task<Result<string>> GetPrimaryPhoneNumber(string customerId, CancellationToken cancellationToken = default)
     {
@@ -222,7 +221,7 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
 
         if (deletedPhoneNumber is null)
             return Result.Failure(CustomerErrors.PhoneNumber.NotFound);
-        
+
         if (deletedPhoneNumber.IsPrimary)
             return Result.Failure(CustomerErrors.PhoneNumber.DeletePrimary);
 

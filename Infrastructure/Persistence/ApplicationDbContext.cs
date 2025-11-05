@@ -1,7 +1,7 @@
 ﻿#region Usings
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using System.Reflection; 
+using System.Reflection;
 
 #endregion
 

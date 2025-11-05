@@ -17,7 +17,7 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
 
         var orders = await _unitOfWork.Orders
             .FindPaginatedListAsync<OrderResponse>
-            (   
+            (
                 o => o.Status == status,
                 checkedFilters.PageNumber,
                 checkedFilters.PageSize,
@@ -54,7 +54,7 @@ public class OrderManagementService(IUnitOfWork unitOfWork) : IOrderManagementSe
 
         return Result.Success(response);
     }
-    
+
     public async Task<IPaginatedList<OrderManagementResponse>> GetCurrentHistoryAsync(RequestFilters filters, CancellationToken cancellationToken = default)
     {
         var checkedFilters = filters.Check(_allowedSortColumns);
